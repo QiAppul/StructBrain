@@ -5,7 +5,7 @@
   "main": "main.js",
   "author": "QiAppul",
   "license": "MIT",
-  "scripts": {"start":"electron .","dist":"electron-builder --win nsis --x64"},
+  "scripts": {"start":"electron .","dist":"electron-builder --win nsis --x64 --publish never"},
   "devDependencies": {"electron":"^38.0.0","electron-builder":"^26.0.0"},
   "build": {"appId":"com.structbrain.desktop","productName":"StructBrain 构脑","files":["**/*"],"directories":{"output":"dist"},"win":{"target":"nsis","artifactName":"StructBrain-Setup-${version}.exe"},"nsis":{"oneClick":false,"allowToChangeInstallationDirectory":true,"createDesktopShortcut":true,"createStartMenuShortcut":true}}
 }
