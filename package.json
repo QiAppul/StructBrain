@@ -1,0 +1,11 @@
+{
+  "name": "structbrain",
+  "version": "1.0.0",
+  "description": "StructBrain 产品结构设计知识库",
+  "main": "main.js",
+  "author": "QiAppul",
+  "license": "MIT",
+  "scripts": {"start":"electron .","dist":"electron-builder --win nsis --x64"},
+  "devDependencies": {"electron":"^38.0.0","electron-builder":"^26.0.0"},
+  "build": {"appId":"com.structbrain.desktop","productName":"StructBrain 构脑","files":["**/*"],"directories":{"output":"dist"},"win":{"target":"nsis","artifactName":"StructBrain-Setup-${version}.exe"},"nsis":{"oneClick":false,"allowToChangeInstallationDirectory":true,"createDesktopShortcut":true,"createStartMenuShortcut":true}}
+}
