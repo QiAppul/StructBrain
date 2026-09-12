@@ -1,2 +1,1923 @@
 <!DOCTYPE html>
-<html lang="zh-CN"><head><meta charset="UTF-8"><title>StructBrain 构脑</title></head><body><h1>StructBrain 构脑</h1><p>应用页面正在载入。</p></body></html>
+<html lang="zh-CN" data-page-node-id="BYUzLGN8RXa9PY0NsrtX8k">
+<head data-page-node-id="kn3iq8ODiv6gn1QJpLrn5u">
+<meta charset="UTF-8" data-page-node-id="L4nrZj1Z8PQKQzopyohm5K">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="MF0HarMHyIuhQQUAlGdqr9">
+<title>结构设计知识库 · Design Knowledge Base</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --panel: #ffffff;
+    --border: #e4e7ec;
+    --text: #1f2329;
+    --text-2: #646a73;
+    --text-3: #8f959e;
+    --primary: #2456e6;
+    --primary-light: #eaf0ff;
+    --green: #16a34a;
+    --green-bg: #e8f7ee;
+    --orange: #d97706;
+    --orange-bg: #fdf3e3;
+    --red: #dc2626;
+    --red-bg: #fdeaea;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(16,24,40,.08), 0 1px 2px rgba(16,24,40,.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--text); font-size: 14px;
+  }
+  /* ===== Top bar ===== */
+  .topbar {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 56px; position: sticky; top: 0; z-index: 50;
+  }
+  .logo { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .logo .dot { width: 10px; height: 10px; border-radius: 3px; background: var(--primary); display: inline-block; }
+  .search-wrap { flex: 1; max-width: 420px; position: relative; }
+  .search-wrap input {
+    width: 100%; height: 34px; border: 1px solid var(--border); border-radius: 8px;
+    padding: 0 12px 0 32px; font-size: 13px; background: var(--bg); outline: none;
+  }
+  .search-wrap input:focus { border-color: var(--primary); background: #fff; }
+  .search-wrap svg { position: absolute; left: 10px; top: 9px; color: var(--text-3); }
+  .nav-tabs { display: flex; gap: 4px; margin-left: auto; }
+  .nav-tabs button {
+    border: none; background: transparent; padding: 8px 14px; font-size: 13.5px;
+    border-radius: 8px; cursor: pointer; color: var(--text-2); font-family: inherit;
+  }
+  .nav-tabs button:hover { background: var(--bg); }
+  .nav-tabs button.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  /* ===== Layout ===== */
+  .layout { display: flex; min-height: calc(100vh - 56px); }
+  .sidebar {
+    width: 200px; flex-shrink: 0; background: var(--panel);
+    border-right: 1px solid var(--border); padding: 16px 10px;
+  }
+  .sidebar h4 { font-size: 12px; color: var(--text-3); font-weight: 500; padding: 0 10px 8px; }
+  .cat-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 10px; border-radius: 8px; cursor: pointer; color: var(--text-2);
+    font-size: 13.5px; margin-bottom: 2px;
+  }
+  .cat-item:hover { background: var(--bg); }
+  .cat-item.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .cat-item .count { font-size: 11.5px; color: var(--text-3); background: var(--bg); border-radius: 10px; padding: 1px 8px; }
+  .cat-item.active .count { background: #fff; color: var(--primary); }
+  .main { flex: 1; padding: 20px 24px 60px; max-width: 1100px; }
+  .view { display: none; }
+  .view.active { display: block; }
+  /* ===== Buttons ===== */
+  .btn {
+    border: 1px solid var(--border); background: var(--panel); color: var(--text);
+    padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: var(--bg); }
+  .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 500; }
+  .btn-primary:hover { background: #1d47c4; }
+  .btn-danger { color: var(--red); }
+  .btn-danger:hover { background: var(--red-bg); }
+  .btn-sm { padding: 4px 10px; font-size: 12.5px; }
+  .btn-ghost { border-color: transparent; background: transparent; color: var(--text-2); }
+  .btn-ghost:hover { background: var(--bg); }
+  /* ===== Rule cards ===== */
+  .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .page-head h2 { font-size: 18px; }
+  .page-head .sub { color: var(--text-3); font-size: 12.5px; margin-top: 4px; }
+  .rule-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  .rule-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px;
+    cursor: pointer; transition: border-color .15s;
+  }
+  .rule-card:hover { border-color: var(--primary); }
+  .rule-card .rc-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .rule-card h3 { font-size: 14.5px; font-weight: 600; line-height: 1.4; }
+  .rule-card p { color: var(--text-2); font-size: 13px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 11.5px; background: var(--bg); color: var(--text-2); padding: 2px 9px; border-radius: 10px; }
+  .cat-badge { font-size: 11.5px; color: var(--primary); background: var(--primary-light); padding: 2px 9px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+  .empty { text-align: center; color: var(--text-3); padding: 60px 0; font-size: 13.5px; }
+  /* ===== Modal ===== */
+  .modal-mask {
+    display: none; position: fixed; inset: 0; background: rgba(16,24,40,.45);
+    z-index: 100; align-items: flex-start; justify-content: center; padding: 32px 20px;
+  }
+  .modal-mask.show { display: flex; }
+  .modal {
+    background: var(--panel); border-radius: 12px; width: 640px; max-width: 100%;
+    max-height: calc(100vh - 64px); overflow: auto; padding: 24px; box-shadow: 0 8px 30px rgba(16,24,40,.18);
+    resize: both; min-width: 420px; min-height: 260px;
+  }
+  #ckEditBox { width: 800px; }
+  .modal.full { resize: none; }
+  .modal h3 { font-size: 16px; margin-bottom: 18px; }
+  .form-row { margin-bottom: 14px; }
+  .form-row label { display: block; font-size: 13px; color: var(--text-2); margin-bottom: 6px; font-weight: 500; }
+  .form-row input, .form-row textarea, .form-row select {
+    width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
+    font-size: 13.5px; font-family: inherit; outline: none; background: #fff; color: var(--text);
+  }
+  .form-row textarea { min-height: 110px; resize: vertical; line-height: 1.6; }
+  .form-row input:focus, .form-row textarea:focus, .form-row select:focus { border-color: var(--primary); }
+  .form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+  /* ===== Checklist ===== */
+  .ck-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px; margin-bottom: 14px; box-shadow: var(--shadow); cursor: pointer;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .ck-card:hover { border-color: var(--primary); }
+  .ck-card .ck-name { font-weight: 600; font-size: 14.5px; margin-bottom: 4px; }
+  .ck-card .ck-meta { color: var(--text-3); font-size: 12.5px; }
+  .progress { height: 8px; background: var(--bg); border-radius: 6px; overflow: hidden; flex: 1; }
+  .progress-bar { height: 100%; background: var(--primary); border-radius: 6px; transition: width .3s; }
+  .ck-item {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 10px;
+  }
+  .ck-item .ci-top { display: flex; gap: 12px; align-items: flex-start; }
+  .ck-item .ci-num { color: var(--text-3); font-size: 12.5px; min-width: 34px; padding-top: 2px; }
+  .ck-item .ci-body { flex: 1; }
+  .ck-item .ci-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .ck-item .ci-content { color: var(--text-2); font-size: 13px; line-height: 1.65; white-space: pre-wrap; }
+  .ck-item .ci-note { margin-top: 8px; }
+  .ck-item .ci-note input {
+    width: 100%; border: 1px dashed var(--border); border-radius: 6px; padding: 6px 10px;
+    font-size: 12.5px; font-family: inherit; outline: none; color: var(--text); background: var(--bg);
+  }
+  .ck-item .ci-note input:focus { border-color: var(--primary); border-style: solid; background: #fff; }
+  .state-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .state-btns button {
+    border: 1px solid var(--border); background: #fff; border-radius: 8px; padding: 5px 11px;
+    font-size: 12.5px; cursor: pointer; font-family: inherit; color: var(--text-2);
+  }
+  .state-btns button:hover { background: var(--bg); }
+  .ck-item[data-state="pass"] { border-color: #bfe8cf; background: #fbfffc; }
+  .ck-item[data-state="pass"] .state-btns .s-pass { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 600; }
+  .ck-item[data-state="risk"] { border-color: #f3ddb8; background: #fffdf8; }
+  .ck-item[data-state="risk"] .state-btns .s-risk { background: var(--orange-bg); border-color: var(--orange); color: var(--orange); font-weight: 600; }
+  .ck-item[data-state="na"] { opacity: .6; }
+  .ck-item[data-state="na"] .state-btns .s-na { background: var(--bg); border-color: var(--text-3); color: var(--text-2); font-weight: 600; }
+  .stat-row { display: flex; gap: 18px; margin: 14px 0 18px; font-size: 13px; color: var(--text-2); align-items: center; flex-wrap: wrap; }
+  .stat-row b { font-size: 15px; }
+  .stat-row .c-pass b { color: var(--green); }
+  .stat-row .c-risk b { color: var(--orange); }
+  /* ===== Data view ===== */
+  .data-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; margin-bottom: 16px; }
+  .data-panel h3 { font-size: 15px; margin-bottom: 6px; }
+  .data-panel p { color: var(--text-2); font-size: 13px; margin-bottom: 14px; line-height: 1.6; }
+  .stat-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .stat-card .v { font-size: 24px; font-weight: 700; color: var(--primary); }
+  .stat-card .l { font-size: 12.5px; color: var(--text-3); margin-top: 4px; }
+  /* ===== Media ===== */
+  .media-grid { display:flex; flex-wrap:wrap; gap:10px; }
+  .media-grid:empty { display:none; }
+  .media-thumb { position:relative; width:112px; height:84px; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--bg); cursor:pointer; }
+  .media-thumb img, .media-thumb video { width:100%; height:100%; object-fit:cover; display:block; }
+  .media-thumb .m-del { position:absolute; top:4px; right:4px; width:20px; height:20px; border:none; border-radius:50%; background:rgba(0,0,0,.55); color:#fff; cursor:pointer; font-size:11px; line-height:20px; padding:0; }
+  .media-thumb .m-del:hover { background:var(--red); }
+  .media-thumb .m-badge { position:absolute; left:4px; bottom:4px; background:rgba(0,0,0,.55); color:#fff; font-size:10px; padding:1px 6px; border-radius:6px; pointer-events:none; }
+  #viewerOverlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:300; align-items:center; justify-content:center; }
+  #viewerOverlay.show { display:flex; }
+  #viewerOverlay img, #viewerOverlay video { max-width:92vw; max-height:88vh; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5); }
+  #viewerOverlay .v-close { position:absolute; top:20px; right:24px; background:rgba(255,255,255,.15); border:none; color:#fff; width:36px; height:36px; border-radius:50%; font-size:16px; cursor:pointer; }
+  #viewerOverlay .v-close:hover { background:rgba(255,255,255,.3); }
+  /* ===== 附件右键菜单 ===== */
+  #mediaCtx { display:none; position:fixed; z-index:400; background:var(--panel); border:1px solid var(--border); border-radius:10px; box-shadow:var(--shadow); padding:5px; min-width:180px; }
+  #mediaCtx .ctx-item { display:flex; align-items:center; gap:8px; padding:7px 12px; border-radius:7px; font-size:13px; cursor:pointer; color:var(--text); white-space:nowrap; }
+  #mediaCtx .ctx-item:hover { background:var(--bg); }
+  #mediaCtx .ctx-item.danger { color:var(--red); }
+  #mediaCtx .ctx-sep { height:1px; background:var(--border); margin:4px 6px; }
+  /* ===== 删除撤销条 ===== */
+  #undoBar { display:none; position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:200; background:var(--panel); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow); padding:12px 18px; align-items:center; gap:14px; font-size:13.5px; max-width:80vw; }
+  #undoBar.show { display:flex; }
+  #undoBar #undoMsg { color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #undoBar button { border:none; background:var(--primary); color:#fff; border-radius:8px; padding:6px 14px; font-size:13px; cursor:pointer; white-space:nowrap; }
+  #undoBar button:hover { filter:brightness(1.08); }
+  #undoBar .u-close { background:transparent; color:var(--text-3); padding:6px 4px; font-size:14px; }
+  #mediaPathModal .mp-path { font-family:Consolas,monospace; font-size:12.5px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 12px; word-break:break-all; line-height:1.6; text-align:left; }
+  /* ===== 窗口化弹窗 ===== */
+  .win-header { display:flex; justify-content:space-between; align-items:center; margin:-24px -24px 16px; padding:10px 12px 10px 20px; border-bottom:1px solid var(--border); background:var(--bg); border-radius:12px 12px 0 0; user-select:none; cursor:move; }
+  .win-header .win-title { font-size:14.5px; font-weight:600; }
+  .win-btns { display:flex; gap:2px; }
+  .win-btns button { border:none; background:transparent; width:30px; height:28px; border-radius:6px; cursor:pointer; color:var(--text-2); font-size:13px; line-height:1; }
+  .win-btns button:hover { background:#e4e7ec; color:var(--text); }
+  .win-btns button.w-close:hover { background:var(--red); color:#fff; }
+  .modal.full { width:100vw; max-width:none; height:100vh; max-height:none; display:flex; flex-direction:column; position:static !important; left:auto !important; top:auto !important; margin:0; border-radius:0; }
+  .modal-mask.fullmask { padding:0; }
+  .modal.full .win-body { flex:1; overflow:auto; min-height:0; }
+  .modal.full .modal-footer { margin-top:auto; }
+  #winMiniBar { display:none; position:fixed; left:20px; bottom:20px; z-index:150; background:var(--panel); border:1px solid var(--border); border-radius:10px; box-shadow:var(--shadow); padding:10px 16px; cursor:pointer; font-size:13px; align-items:center; gap:8px; max-width:320px; }
+  #winMiniBar:hover { border-color:var(--primary); }
+  /* ===== 清单项内联编辑 ===== */
+  .er-row { display:grid; grid-template-columns:1fr auto auto; gap:12px; align-items:start; padding:7px 0; border-bottom:1px dashed var(--border); text-align:left; }
+  .er-row:last-child { border-bottom:none; }
+  .er-main { min-width:0; text-align:left; }
+  .er-title { display:block; text-align:left; font-size:13px; line-height:1.6; padding-top:3px; word-break:break-all; }
+  .er-badge { font-size:10.5px; color:var(--orange); background:var(--orange-bg); border-radius:8px; padding:1px 7px; margin-left:6px; white-space:nowrap; }
+  .er-check { display:flex; align-items:center; padding-top:3px; cursor:pointer; }
+  .er-check input { width:15px; height:15px; cursor:pointer; margin:0; }
+  .er-editor { display:none; margin-top:8px; padding:10px 12px; background:var(--bg); border-radius:8px; text-align:left; }
+  .er-editor input, .er-editor textarea { width:100%; border:1px solid var(--border); border-radius:6px; padding:6px 10px; font-size:13px; font-family:inherit; margin-bottom:6px; outline:none; background:#fff; color:var(--text); text-align:left; }
+  .er-editor input:focus, .er-editor textarea:focus { border-color:var(--primary); }
+  .er-editor textarea { min-height:150px; resize:vertical; line-height:1.7; }
+  .er-editor .er-hint { font-size:11.5px; color:var(--text-3); }
+  .tr-btn {
+    position:absolute; top:8px; right:10px; width:26px; height:26px;
+    border:1px solid var(--border); border-radius:6px; background:#fff; color:var(--primary);
+    font-size:12.5px; cursor:pointer; line-height:1; font-family:inherit;
+  }
+  .tr-btn:hover { background:var(--primary-light); border-color:var(--primary); }
+  .tr-btn:disabled { color:var(--text-3); cursor:wait; }
+  /* ===== 设计流程 ===== */
+  .flow-grid { display:grid; grid-template-columns:260px 1fr; gap:20px; align-items:start; }
+  @media (max-width: 800px){ .flow-grid { grid-template-columns:1fr; } }
+  .step-item { display:flex; gap:10px; align-items:center; padding:9px 12px; border-radius:8px; cursor:pointer; background:var(--panel); border:1px solid var(--border); margin-bottom:8px; box-shadow:var(--shadow); }
+  .step-item:hover { border-color:var(--primary); }
+  .step-item.current { border-color:var(--primary); background:var(--primary-light); }
+  .step-ico { width:24px; height:24px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; background:var(--bg); color:var(--text-2); border:1px solid var(--border); }
+  .step-item[data-state="doing"] .step-ico { background:var(--orange-bg); color:var(--orange); border-color:var(--orange); }
+  .step-item[data-state="done"] .step-ico { background:var(--green-bg); color:var(--green); border-color:var(--green); }
+  .step-title { font-size:13px; line-height:1.4; word-break:break-all; }
+  .step-add { width:100%; padding:10px; border:1px dashed var(--border); border-radius:8px; background:transparent; color:var(--text-2); font-size:13px; cursor:pointer; font-family:inherit; }
+  .step-add:hover { border-color:var(--primary); color:var(--primary); }
+  .node-card { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); }
+  .node-card h3 { font-size:17px; margin-bottom:4px; }
+  .node-content { white-space:pre-wrap; line-height:1.8; font-size:13.5px; color:var(--text); margin:12px 0; text-align:left; }
+  .node-note { margin-top:12px; }
+  .node-note input { width:100%; border:1px dashed var(--border); border-radius:6px; padding:7px 10px; font-size:12.5px; font-family:inherit; outline:none; color:var(--text); background:var(--bg); }
+  .node-note input:focus { border-color:var(--primary); border-style:solid; background:#fff; }
+  .node-btns { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .state-btns.v2 button { padding:6px 12px; }
+  .node-edit input, .node-edit textarea { width:100%; border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13.5px; font-family:inherit; outline:none; margin-bottom:10px; background:#fff; color:var(--text); }
+  .node-edit input:focus, .node-edit textarea:focus { border-color:var(--primary); }
+  .node-edit textarea { min-height:220px; resize:vertical; line-height:1.7; }
+  /* ===== Toast ===== */
+  #toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #1f2329; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px;
+    opacity: 0; transition: all .25s; pointer-events: none; z-index: 200;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toolbar-line { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+  select.mini { border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 13px; font-family: inherit; background: #fff; outline: none; color: var(--text); }
+  .detail-content { white-space: pre-wrap; line-height: 1.7; font-size: 13.5px; color: var(--text); margin: 10px 0; }
+</style>
+</head>
+<body data-page-node-id="fm3DdNXwNcRq6aXIoCc1KO">
+
+<div class="topbar" data-page-node-id="VgXE2GGNIeqrEn3f7Tqgu9">
+  <div class="logo" data-page-node-id="wVO9wrCq6uFqAESyEuzCM2"><span class="dot" data-page-node-id="iTtpoEbJA1puoUhcA6HI62"></span>结构设计知识库</div>
+  <div class="search-wrap" data-page-node-id="mI8ZiGQdUbMBbZqLLJBNgU">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="11B5yPC7uyapqz4T7Glcqt"><circle cx="11" cy="11" r="7" data-page-node-id="GLnOCY3A15hiU3hyakeUEY"/><path d="M21 21l-4.3-4.3" data-page-node-id="KMZRdmJnqJsI5XPWeV5y5f"/></svg>
+    <input id="globalSearch" placeholder="搜索规范标题、内容、标签…" data-page-node-id="PWdjnEBlM431AEZE9xxshM">
+  </div>
+  <div class="nav-tabs" data-page-node-id="bpLtcWTN2112auU3cF4UZR">
+    <button data-view="rules" class="active" data-page-node-id="2GPXGVds2MBRwhzHXDGwMy">规范库</button>
+    <button data-view="checks" data-page-node-id="GAlz3uUPJVEdU0kpHLjRvO">检查清单</button>
+    <button data-view="flow">塑胶产品结构设计</button>
+    <button data-view="data" data-page-node-id="NAiWbnwAUwK9H2Pvo7Ejky">数据管理</button>
+  </div>
+</div>
+
+<div class="layout" data-page-node-id="H7uQGrMtR95HZt04lxYDgB">
+  <div class="sidebar" id="sidebar" data-page-node-id="bSSVNnjgbN9zl2AONx0Err">
+    <h4 data-page-node-id="G8gkZIrnPpGtWcUdXcFYkJ">分类</h4>
+    <div class="cat-item active" data-cat="all" data-page-node-id="tRkIvBNI811KAmxAVzMtLe"><span data-page-node-id="BqJdt3R2Q1KWLOckkGCMEr">全部规范</span><span class="count" id="countAll" data-page-node-id="alnffZZmTvEEBexFFuzaD5">0</span></div>
+    <div id="catList" data-page-node-id="hKlCGhMAfMLhXMCHSb87D5"></div>
+    <h4 style="margin-top:14px" data-page-node-id="G8ukORk6MFQlQbQA59PvvX">统计</h4>
+    <div style="padding:0 10px;font-size:12.5px;color:var(--text-3)" id="sidebarStats" data-page-node-id="88VRNbK5fOoAfbqzeUDcEM"></div>
+    <div id="pcSyncWrap" style="padding:10px 10px 16px"><button class="btn" id="pcSyncBtn" onclick="syncToPhone()" style="width:100%;font-size:12.5px">⇪ 同步到手机</button></div>
+  </div>
+  <div class="main" data-page-node-id="UxL0DnZlT6WD4Voflh4yGK">
+
+    <!-- ===== 规范库 ===== -->
+    <div class="view active" id="view-rules" data-page-node-id="MnOzAvlaz8ETFMkeCj48id">
+      <div class="page-head" data-page-node-id="0rG4YbYVsAGrAFG4jWPgFk">
+        <div data-page-node-id="hDz5XVAudSLmvAMksrIndh"><h2 id="rulesTitle" data-page-node-id="tAuSxYbG05dZHaDgqlzjN4">全部规范</h2><div class="sub" id="rulesSub" data-page-node-id="GbCwwzisSG4PBfwi3FBtCy"></div></div>
+        <button class="btn btn-primary" onclick="openRuleEditor()" data-page-node-id="81H8llpKwjVp4VsSLcpgP4">＋ 新增规范</button>
+      </div>
+      <div class="toolbar-line" data-page-node-id="Elkxi0dYRXT6HiGlBLZD57">
+        <select class="mini" id="sortSelect" onchange="renderRules()" data-page-node-id="DGGealFTZb3kiBsucIaUww">
+          <option value="time" data-page-node-id="Fei8zDzpUMilwraiGsPFod">按更新时间</option>
+          <option value="cat" data-page-node-id="mzXP21hI8B9r9fG06iRVui">按分类</option>
+          <option value="title" data-page-node-id="BVCvgX0dl5DaC4DHs4JBH8">按标题</option>
+        </select>
+        <span style="font-size:12.5px;color:var(--text-3)" id="ruleCountLabel" data-page-node-id="wm4IEoEXNOd5q4Oy1mxDNd"></span>
+      </div>
+      <div class="rule-grid" id="ruleGrid" data-page-node-id="saErJiQV8M5TzGipwTwRW2"></div>
+    </div>
+
+    <!-- ===== 检查清单 ===== -->
+    <div class="view" id="view-checks" data-page-node-id="m2PntIefPKPrj1GYthOgEd">
+      <!-- 列表态 -->
+      <div id="ckListWrap" data-page-node-id="DjrCsgvIqosQuWacajBPWq">
+        <div class="page-head" data-page-node-id="jYADHkSY1FCGbx8J8G1AbZ">
+          <div data-page-node-id="DfC3MmSXk81nIDJSeHNAdr"><h2 data-page-node-id="LSFFpRMwpmfexIbni7dRHj">检查清单</h2><div class="sub" data-page-node-id="wluoUjn5kLKPFTIUiUe7ex">针对每个新设计项目，从规范库生成检查清单，逐条自查。点击卡片进入执行，卡片上可编辑/复制/备份/删除</div></div>
+          <div style="display:flex;gap:10px">
+            <button class="btn" onclick="document.getElementById('ckImportFile').click()">导入清单</button>
+            <input type="file" id="ckImportFile" accept=".json" style="display:none" onchange="importCheck(this.files[0]); this.value='';">
+            <button class="btn btn-primary" onclick="openNewCheck()" data-page-node-id="HuHSKaeADZGqCj5kUUamkt">＋ 新建检查清单</button>
+          </div>
+        </div>
+        <div id="ckList" data-page-node-id="yrubwAW5bnkL5bUpSJL2sd"></div>
+      </div>
+      <!-- 执行态 -->
+      <div id="ckRunWrap" style="display:none" data-page-node-id="e5IuF7WaBV00yRLqjIDEIP">
+        <div class="page-head" data-page-node-id="DjjB8fsLZiQEhXGCt2pkUb">
+          <div style="display:flex;align-items:center;gap:12px" data-page-node-id="MDl2ewLT5l1LcMmzmIKpRj">
+            <button class="btn btn-ghost btn-sm" onclick="exitCheck()" data-page-node-id="uq9lhuARw1m9ipgeJ5y0nK">← 返回列表</button>
+            <div data-page-node-id="KGsCPaKJhIUcoCGuLd7ltR"><h2 id="ckRunTitle" data-page-node-id="L11rIt6FvhNAlWHCW5XDfK"></h2><div class="sub" id="ckRunMeta" data-page-node-id="cyONhdsOShSuqHiOZBNTlM"></div></div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="deleteCheck()" data-page-node-id="cy8CBCGUQg8C54t0Mf2tTT">删除此清单</button>
+        </div>
+        <div class="stat-row" id="ckStats" data-page-node-id="f6uOPvLAGnIxiOhCTFzcJw"></div>
+        <div class="progress" style="margin-bottom:20px" data-page-node-id="NyhKaCBd0xGgkMOUkJHKRR"><div class="progress-bar" id="ckProgressBar" data-page-node-id="etoHU5nyOpSaLRPWZqqYh1"></div></div>
+        <div id="ckItems" data-page-node-id="DN54YkGAKY3G4UlSNb1GMf"></div>
+      </div>
+    </div>
+
+    <!-- ===== 塑胶产品结构设计流程 ===== -->
+    <div class="view" id="view-flow">
+      <div id="flowListWrap">
+        <div class="page-head">
+          <div><h2>塑胶产品结构设计</h2><div class="sub">按设计流程逐步推进：外形尺寸 → 壁厚 → 拔模分模 → … → 装配，每个节点可自定义编辑</div></div>
+          <button class="btn btn-primary" onclick="createFlow()">＋ 新建设计流程</button>
+        </div>
+        <div id="flowList"></div>
+      </div>
+      <div id="flowRunWrap" style="display:none">
+        <div class="page-head">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="btn btn-ghost btn-sm" onclick="exitFlow()">← 返回列表</button>
+            <div>
+              <h2 id="flowRunTitle" style="cursor:pointer" title="点击重命名" onclick="renameFlow()"></h2>
+              <div class="sub" id="flowRunMeta"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm" onclick="copyFlow()">⧉ 复制</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteFlow()">✕ 删除</button>
+          </div>
+        </div>
+        <div class="stat-row" id="flowStats"></div>
+        <div class="progress" style="margin-bottom:20px"><div class="progress-bar" id="flowProgressBar"></div></div>
+        <div class="flow-grid">
+          <div id="flowSteps"></div>
+          <div id="flowNodeCard"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 数据管理 ===== -->
+    <div class="view" id="view-data" data-page-node-id="O5IqJJ18bicMxOWm0oUbBB">
+      <div class="page-head" data-page-node-id="vH1sz8NnSUiC7SDRidDPgZ"><div data-page-node-id="Mdsb30IDISvsJwqvoREOdZ"><h2 data-page-node-id="1cm0DFS9FcDNEuJBooTzom">数据管理</h2><div class="sub" data-page-node-id="QHclKbnwp0NGePfAcRRZW8">所有数据保存在本浏览器中，建议定期导出备份</div></div></div>
+      <div class="stat-cards" id="statCards" data-page-node-id="YTnHZCAtCpmOhz8AcCNSbF"></div>
+      <div class="data-panel" data-page-node-id="eBTBHfeepCGGUy59KiJtaT">
+        <h3 data-page-node-id="hDxZ5Ud5KGeCHdav5okswM">导出备份</h3>
+        <p data-page-node-id="hQLLxJ75cVjIcSp8YzdfQB">将全部规范、检查清单与附件（图片/视频）导出为 JSON 文件，可用于备份或在其他电脑上导入。附件较多时文件会较大、导出耗时稍长。</p>
+        <button class="btn btn-primary" onclick="exportData()" data-page-node-id="SUFDjuCB1JVoxsugrCLGyh">导出 JSON 备份</button>
+      </div>
+      <div class="data-panel" data-page-node-id="O23dxMa8wN1WKxMkqEcqvq">
+        <h3 data-page-node-id="hD5VVACioYKAmJMBBszsoI">导入数据</h3>
+        <p data-page-node-id="fGcGlJ7QkACB5BuCJyvEgT">从 JSON 备份文件恢复数据。<b data-page-node-id="CPWAKaREgKDHtj5Nq0hLWi">合并导入</b>：保留现有数据，追加新数据（按 ID 去重）；<b data-page-node-id="YOgmRAFGZlVFrsdr7amuWG">完全覆盖</b>：用备份替换当前全部数据。</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap" data-page-node-id="Mfzf1XnC2q2NXnylVWHVHs">
+          <input type="file" id="importFile" accept=".json" style="font-size:13px" data-page-node-id="E2PWDGxv7sZTrHPahqfZxd">
+          <button class="btn" onclick="importData('merge')" data-page-node-id="hNa9VlIeEEG4pfHUTKCpuV">合并导入</button>
+          <button class="btn btn-danger" onclick="importData('replace')" data-page-node-id="p1qOJYFO9KZNhKPTYJ803E">完全覆盖</button>
+        </div>
+      </div>
+      <div class="data-panel" data-page-node-id="EONj5qJ98Up52cLDKsHJSm">
+        <h3 data-page-node-id="N6a947BekiwjZLgixv6JLl">重置预置规范</h3>
+        <p data-page-node-id="wWJL0voh7rC1d0SnDPO6ut">重新载入内置的结构设计规范种子数据（不影响你已创建的规范，按 ID 跳过重复项）。</p>
+        <button class="btn" onclick="resetSeed()" data-page-node-id="va1PtkABTwYT6crv9ZsuKI">载入预置规范</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 规范编辑弹窗 -->
+<div class="modal-mask" id="ruleModal" data-page-node-id="sBkXXH2ozcav4rRXNXEB2d">
+  <div class="modal" data-page-node-id="4oLhbeflO0z9UMak9slywp">
+    <h3 id="ruleModalTitle" data-page-node-id="unGrRrOs9YH0dpKkIL5ok4">新增规范</h3>
+    <div class="form-row" data-page-node-id="XUdlISvHLQOAAI4B9B0XMY"><label data-page-node-id="YhikVRQFLEEphMntE5oiNd">标题 *</label><input id="fTitle" placeholder="例：注塑件加强筋厚度要求" data-page-node-id="jGkzA75MntjwhZg7oOD9N4"></div>
+    <div class="form-2col" data-page-node-id="xRZjWw0ClQlw9kfOVyIwzn">
+      <div class="form-row" data-page-node-id="tWuAMzNBtl4Z4D5F88EDhd"><label data-page-node-id="dwnfknBFNwA3ty99F1bWiL">分类</label><select id="fCat" data-page-node-id="3kESQHJrNEG4Zvsqm9bxEO"></select></div>
+      <div class="form-row" data-page-node-id="rplgK5mlgEk6pF8tNHYxMI"><label data-page-node-id="qpuMElY815BfIGd8aRlq8Q">标签（逗号分隔）</label><input id="fTags" placeholder="例：壁厚,缩水,注塑" data-page-node-id="CNurkXSlukkuIOae5NHuY8"></div>
+    </div>
+    <div class="form-row" data-page-node-id="U9sjznkAXCQ8kFMGRpUy8E"><label data-page-node-id="HKNzILQNBGF4FkVQvQFhN7">内容（可包含参数建议、适用条件、失效后果等）</label><textarea id="fContent" placeholder="例：加强筋厚度建议不超过相连主壁厚的 0.6 倍，避免背面出现缩水凹痕。筋根 R 角建议 ≥ 0.3t。"></textarea></div>
+    <div class="form-row"><label>图片 / 视频（支持 Ctrl+V 粘贴截图）</label>
+      <div id="mediaGrid" class="media-grid"></div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap">
+        <button type="button" class="btn btn-sm" onclick="document.getElementById('mediaFile').click()">＋ 添加图片/视频</button>
+        <button type="button" class="btn btn-sm" id="authDirBtn" style="display:none" onclick="authorizeFileDir()">📁 授权 file 文件夹</button>
+        <input type="file" id="mediaFile" accept="image/*,video/*" multiple style="display:none" onchange="addMediaFiles(this.files); this.value='';">
+        <span style="font-size:12px;color:var(--text-3)">附件保存到 HTML 同目录的 file 文件夹（首次添加时授权选择；浏览器不支持时存入浏览器数据库）· 建议单个 ≤ 50MB · <b>右键附件</b>可查看所在目录或删除</span>
+      </div>
+    </div>
+    <div class="form-row" data-page-node-id="7nZgd6x7OEoLAxsXOUKFLx"><label data-page-node-id="36dPyRDiEbDCMVtKdiLxC0">来源（选填）</label><input id="fSource" placeholder="例：某项目复盘 / 供应商评审 / 行业手册" data-page-node-id="V39cIl3COigCNTE2KNYqAW"></div>
+    <div class="modal-footer" data-page-node-id="2aCFErcD16wCAgBf9LetbW">
+      <button class="btn" onclick="closeRuleEditor()" data-page-node-id="cDbbdxq3abbZETwJFULLW1">取消</button>
+      <button class="btn btn-primary" onclick="saveRule()" data-page-node-id="6QHqUML63EQW3Ed0ok9J55">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新建检查清单弹窗 -->
+<div class="modal-mask" id="ckModal" data-page-node-id="kX8A71KvcbCe31MA1qdLtB">
+  <div class="modal" data-page-node-id="h8jnvApdHx8697U6Lfu86o">
+    <h3 data-page-node-id="zWItIRvswtJJgyZ4Hxdu3y">新建检查清单</h3>
+    <div class="form-row" data-page-node-id="B7Dqk7UGgCcQZqGcDJ5roM"><label data-page-node-id="EqMj8JLzuSbEM9ArGM1F1Y">项目名称 *</label><input id="ckName" placeholder="例：XX产品外壳 v1.0 设计评审" data-page-node-id="F2lq7er9CO4Fbx9dTvlXBB"></div>
+    <div class="form-row" data-page-node-id="3wAyEOiC29MRkVxEmDuSIN"><label data-page-node-id="HIiH0qDMdQ2cp1jD0KeFdK">选择要纳入的规范分类（可多选）</label>
+      <div id="ckCatPick" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:220px;overflow-y:auto;padding:10px;border:1px solid var(--border);border-radius:8px" data-page-node-id="FEOkZv4XFV3g3YvLiubOP0"></div>
+    </div>
+    <div class="modal-footer" data-page-node-id="sjNIB9yXXTQl9ov0YCofgM">
+      <button class="btn" onclick="closeModal('ckModal')" data-page-node-id="zQ2T2ExUUk0BLFZaUqUDgX">取消</button>
+      <button class="btn btn-primary" onclick="createCheck()" data-page-node-id="ot14bET8f7sBfIj4LaMJAE">创建</button>
+    </div>
+  </div>
+</div>
+
+<!-- 编辑检查清单弹窗 -->
+<div class="modal-mask" id="ckEditModal">
+  <div class="modal" id="ckEditBox">
+    <div class="win-header">
+      <span class="win-title">编辑检查清单</span>
+      <div class="win-btns">
+        <button title="最小化" onclick="minimizeCkEdit()">—</button>
+        <button title="放大 / 还原（放大到整个浏览器窗口）" onclick="winToggleFull()">□</button>
+        <button title="关闭" class="w-close" onclick="closeCkEdit()">✕</button>
+      </div>
+    </div>
+    <div class="win-body">
+      <div class="form-row"><label>项目名称 *</label><input id="ckEditName" placeholder="例：XX产品外壳 v1.0 设计评审"></div>
+      <div class="form-row"><label>勾选要包含的规范（取消勾选即从清单中移除该项）；点「编辑」可修改条目内容，仅对本清单生效</label>
+        <div id="ckEditRules" style="max-height:calc(100vh - 380px);min-height:240px;overflow:auto;padding:10px 14px;border:1px solid var(--border);border-radius:8px;text-align:left"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeCkEdit()">取消</button>
+      <button class="btn btn-primary" onclick="saveCheckEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="winMiniBar" onclick="restoreCkEdit()">📝 <span id="winMiniText">编辑检查清单中</span> · 点击恢复窗口</div>
+
+<!-- 规范详情弹窗 -->
+<div class="modal-mask" id="detailModal" data-page-node-id="71cK0r55fppayojJNpbqzm">
+  <div class="modal" data-page-node-id="780CXxiscljz4GdBqdcdVR">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px" data-page-node-id="PKaRqdRmyXLHjrFg9Kdqoo">
+      <h3 id="dtTitle" data-page-node-id="i1AQzNWVEgAhgMTHhyiPo7"></h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('detailModal')" data-page-node-id="5gHYIm1kdPd3xZpyYtIXKv">✕</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px" data-page-node-id="ohLOsDZYDhldEScZYIkZAm">
+      <span class="cat-badge" id="dtCat" data-page-node-id="G5kzyBI8tCpIAxAeeVI7e5"></span><span class="tags" id="dtTags" data-page-node-id="A2eevxBwOS39l4fsGN6O9L"></span>
+    </div>
+    <div class="detail-content" id="dtContent" data-page-node-id="QVqcgMQFjTKSfNrjQ0RNCL"></div>
+    <div id="dtMedia" class="media-grid" style="margin:10px 0"></div>
+    <div style="font-size:12.5px;color:var(--text-3)" id="dtMeta" data-page-node-id="J3Iairq1buJaEwIxoFM2fy"></div>
+    <div class="modal-footer" data-page-node-id="bwBcs9cCXAceEWoyeQEZDS">
+      <button class="btn btn-danger" onclick="deleteRuleFromDetail()" data-page-node-id="DjF9Y1N5sBbVKGZE6Slg2N">删除</button>
+      <button class="btn" onclick="editFromDetail()" data-page-node-id="poUIsazG8UiaG3LoIoTSVI">编辑</button>
+      <button class="btn btn-primary" onclick="closeModal('detailModal')" data-page-node-id="fAI3GH2wt8PWHLdzOHUIWk">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div id="viewerOverlay" onclick="if(event.target===this) closeViewer()">
+  <button class="v-close" onclick="closeViewer()">✕</button>
+  <div id="viewerContent"></div>
+</div>
+
+<div id="toast" data-page-node-id="TyLgVLBZn94ido2qUwUE5d"></div>
+
+<!-- 删除撤销条 -->
+<div id="undoBar">
+  <span id="undoMsg"></span>
+  <button onclick="undoDeleteRule()">↩ 撤销删除</button>
+  <button class="u-close" title="放弃撤销" onclick="finalizeDelete();hideUndoBar()">✕</button>
+</div>
+
+<!-- 附件右键菜单 -->
+<div id="mediaCtx"></div>
+
+<!-- 附件所在位置弹窗 -->
+<div class="modal-mask" id="mediaPathModal">
+  <div class="modal" style="width:560px">
+    <h3>附件所在位置</h3>
+    <div class="mp-path" id="mpPath"></div>
+    <p style="font-size:12px;color:var(--text-3);line-height:1.7;margin:10px 0 0">
+      附件保存在 HTML 文件同目录的 <b>file</b> 文件夹内。在文件管理器中进入上述目录即可查看、拷贝、管理原始文件。</p>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('mediaPathModal')">关闭</button>
+      <button class="btn" id="mpOpenBtn" onclick="mpOpenDir()">在浏览器中打开所在目录</button>
+      <button class="btn btn-primary" onclick="mpCopyPath()">复制路径</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= 数据层 ================= */
+const DB_KEY = 'sd_kb_data_v1';
+const CATS = ['注塑成型','钣金冲压','压铸/CNC','连接与装配','表面处理','密封与防水','通用结构','其他'];
+
+function loadDB() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY)) || { rules: [], checks: [], flows: null }; }
+  catch(e) { return { rules: [], checks: [], flows: null }; }
+}
+function saveDB() { localStorage.setItem(DB_KEY, JSON.stringify(DB)); }
+let DB = loadDB();
+let state = { view:'rules', cat:'all', search:'', editingRuleId:null, detailRuleId:null, runningCheckId:null, flowView:'list', flowId:null, flowEditing:false };
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function now(){ return new Date().toISOString(); }
+
+/* ================= 媒体存储（IndexedDB，存 Blob 不占 localStorage） ================= */
+const MediaStore = (()=>{
+  let dbp = null;
+  function db(){
+    if(!dbp){
+      dbp = new Promise((res, rej)=>{
+        const req = indexedDB.open('sd_kb_media', 1);
+        req.onupgradeneeded = ()=>{ req.result.createObjectStore('media', {keyPath:'id'}); };
+        req.onsuccess = ()=>res(req.result);
+        req.onerror = ()=>rej(req.error);
+      });
+    }
+    return dbp;
+  }
+  async function store(mode){ const d = await db(); return d.transaction('media', mode).objectStore('media'); }
+  function wrap(req){ return new Promise((res, rej)=>{ req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error); }); }
+  return {
+    put: async rec => wrap((await store('readwrite')).put(rec)),
+    get: async id => wrap((await store('readonly')).get(id)),
+    del: async id => wrap((await store('readwrite')).delete(id)),
+    all: async () => (await wrap((await store('readonly')).getAll())) || [],
+    clear: async () => wrap((await store('readwrite')).clear()),
+  };
+})();
+function blobToDataURL(b){ return new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(b); }); }
+function dataURLtoBlob(du){
+  const [h, b64] = du.split(',');
+  const mime = (h.match(/:(.*?);/)||[,'application/octet-stream'])[1];
+  const bin = atob(b64); const arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return new Blob([arr], {type:mime});
+}
+
+/* 编辑器媒体状态 */
+let editorMedia = [];      // 当前编辑规范的媒体列表 [{id,type,name}]
+let pendingMediaIds = [];  // 本次编辑新加的媒体，取消时清理
+const _objURLs = new Set();
+function objURL(blob){ const u = URL.createObjectURL(blob); _objURLs.add(u); return u; }
+function isVideoMime(m){ return (m||'').startsWith('video/'); }
+
+/* 文件型附件：保存到 HTML 同目录的 file 文件夹（File System Access API） */
+const fileMediaURLs = {};   // path -> objectURL（本会话显示用缓存）
+function mediaSrc(m){ return m.kind==='file' ? (fileMediaURLs[m.path] || m.path) : null; }
+function genFileName(orig){
+  const safe = (orig||'media').replace(/[\\/:*?"<>|]/g,'_');
+  return 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2,6) + '_' + safe;
+}
+async function getDirHandle(interactive){
+  let handle = null;
+  try{ const rec = await MediaStore.get('__dirhandle'); if(rec && rec.handle) handle = rec.handle; }catch(e){}
+  try{
+    if(handle){
+      if(await withTimeout(handle.queryPermission({mode:'readwrite'}), 2000) === 'granted') return handle;
+      if(interactive && await withTimeout(handle.requestPermission({mode:'readwrite'}), 8000) === 'granted') return handle;
+      return null;
+    }
+    if(!window.showDirectoryPicker) return null;
+    handle = await withTimeout(window.showDirectoryPicker({ id:'sdkbFileDir', mode:'readwrite' }), 120000);
+    await MediaStore.put({ id:'__dirhandle', handle });
+    return handle;
+  }catch(e){ return null; }
+}
+function withTimeout(p, ms){
+  return Promise.race([ p, new Promise((_,rej)=>setTimeout(()=>rej(new Error('授权超时')), ms)) ]);
+}
+async function writeFileToDir(dir, fname, blob){
+  const fh = await dir.getFileHandle(fname, {create:true});
+  const w = await fh.createWritable();
+  await w.write(blob); await w.close();
+}
+async function addMediaFiles(files){
+  /* 关键：立即同步快照文件列表。
+     onchange 里 this.value='' 会在本函数 await 期间清空 FileList，
+     不快照的话循环遍历到的是空列表，附件会被静默丢弃 */
+  const list = [...files];
+  /* 只做非阻塞授权检查（带超时），绝不因文件夹授权问题阻断添加 */
+  let dir = null;
+  try { dir = await withTimeout(getDirHandle(false), 2500); } catch(e){ dir = null; }
+  let savedToIdb = false;
+  for(const f of list){
+    if(!/^(image|video)\//.test(f.type)){ toast(`仅支持图片或视频文件：「${f.name||'未知'}」`); continue; }
+    if(f.size > 200*1024*1024){ toast(`「${f.name}」超过 200MB，已跳过`); continue; }
+    const type = isVideoMime(f.type)?'video':'image';
+    const name = f.name||'clipboard.png';
+    if(dir){
+      try{
+        const fname = genFileName(name);
+        await withTimeout(writeFileToDir(dir, fname, f), 60000);
+        const path = 'file/'+fname;
+        fileMediaURLs[path] = objURL(f);
+        editorMedia.push({ kind:'file', path, type, mime:f.type, name });
+        continue;
+      }catch(e){ toast('写入 file 文件夹失败，该附件改存浏览器数据库'); }
+    }
+    try{
+      const id = uid() + '_m';
+      await MediaStore.put({ id, blob: f, type, mime: f.type, name, createdAt: now() });
+      editorMedia.push({ id, type, name });
+      pendingMediaIds.push(id);
+      savedToIdb = true;
+    }catch(e){ toast(`「${name}」保存失败：${(e&&e.message)||'存储不可用'}`); }
+  }
+  renderEditorMedia();
+  if(savedToIdb && !dir && window.showDirectoryPicker){
+    toast('附件已保存（暂存浏览器数据库）。点「📁 授权 file 文件夹」可迁移到磁盘', 4000);
+  }
+}
+/* 手动授权 file 文件夹（独立按钮、带完整用户手势），并把已存的数据库附件迁移过去 */
+async function authorizeFileDir(){
+  if(!window.showDirectoryPicker){ toast('当前浏览器不支持保存到文件夹，附件将继续存于浏览器数据库'); return; }
+  const h = await getDirHandle(true);
+  if(!h){ toast('未获得文件夹授权，可稍后再试'); return; }
+  toast('file 文件夹授权成功');
+  const n = await migrateIdbToFile();
+  renderEditorMedia();
+  if(n) toast(`已把 ${n} 个数据库内的附件迁移到 file 文件夹`);
+}
+async function migrateIdbToFile(){
+  let dir = null;
+  try { dir = await getDirHandle(false); } catch(e){ return 0; }
+  if(!dir) return 0;
+  let n = 0;
+  for(const r of DB.rules){
+    if(!Array.isArray(r.media)) continue;
+    for(const m of r.media){
+      if(m.kind==='file' || !m.id) continue;
+      try{
+        const rec = await MediaStore.get(m.id); if(!rec || !rec.blob) continue;
+        const fname = genFileName(m.name||'media');
+        await writeFileToDir(dir, fname, rec.blob);
+        m.kind = 'file'; m.path = 'file/'+fname;
+        await MediaStore.del(m.id);
+        n++;
+      }catch(e){}
+    }
+  }
+  if(n) saveDB();
+  return n;
+}
+async function removeMedia(idx){
+  const m = editorMedia[idx]; if(!m) return;
+  /* 只从编辑列表移除，不立即删文件——进入撤销窗口，过期/保存时才真正清理 */
+  editorMedia.splice(idx, 1);
+  renderEditorMedia();
+  if(pendingUndo) finalizePending();
+  pendingUndo = { type:'media', item:m, index:idx, scope:'editor' };
+  showUndoBar('已移除附件「' + (m.name||'附件') + '」（保存后正式删除）');
+}
+function thumbHTML(m, url){
+  return m.type==='video'
+    ? `<video src="${url}" muted></video><span class="m-badge">▶ 视频</span>`
+    : `<img src="${url}" alt=""><span class="m-badge">图片</span>`;
+}
+/* ---- 附件右键菜单：查看文件所在目录 / 删除 ---- */
+let ctxTarget = null;         // 当前右键的附件 {m, onDelete}
+let mpCurrentPath = '';       // 路径弹窗当前显示的路径
+let mpCurrentDirURL = '';     // 对应的目录 URL（file:// 或 http 页面下为空）
+function mediaDiskPath(m){
+  if(!m || m.kind!=='file' || !m.path) return '';
+  const href = location.href.replace(/[?#].*$/,'');
+  const dir = href.substring(0, href.lastIndexOf('/')+1);
+  let full;
+  try { full = decodeURIComponent(dir + m.path); } catch(e){ full = dir + m.path; }
+  if(location.protocol==='file:') full = full.replace(/^file:\/\/\//i,'').replace(/\//g,'\\');
+  return full;
+}
+function hideMediaCtx(){ document.getElementById('mediaCtx').style.display='none'; }
+function showMediaCtx(e, m, onDelete){
+  e.preventDefault(); e.stopPropagation();
+  ctxTarget = { m, onDelete };
+  const menu = document.getElementById('mediaCtx');
+  const isFile = m.kind==='file';
+  menu.innerHTML = `
+    <div class="ctx-item" onclick="hideMediaCtx();openViewer(ctxTarget.m)">🔍 放大查看</div>
+    ${isFile
+      ? `<div class="ctx-item" onclick="hideMediaCtx();showMediaPath(ctxTarget.m)">📁 查看文件所在目录</div>`
+      : `<div class="ctx-item" style="color:var(--text-3);cursor:default" title="该附件暂存于浏览器数据库，重新授权 file 文件夹后新增的附件才会存到磁盘">🗄 浏览器数据库内（无磁盘目录）</div>`}
+    <div class="ctx-sep"></div>
+    <div class="ctx-item danger" onclick="hideMediaCtx();ctxTarget.onDelete()">🗑 删除</div>`;
+  menu.style.display = 'block';
+  const r = menu.getBoundingClientRect();
+  menu.style.left = Math.min(e.clientX, window.innerWidth - r.width - 8) + 'px';
+  menu.style.top  = Math.min(e.clientY, window.innerHeight - r.height - 8) + 'px';
+}
+function showMediaPath(m){
+  const p = mediaDiskPath(m);
+  if(!p){ toast('未找到磁盘路径'); return; }
+  mpCurrentPath = p;
+  mpCurrentDirURL = location.protocol==='file:' ? p.replace(/\\+$/,'').replace(/[^\\]*$/,'') : '';
+  document.getElementById('mpPath').textContent = p;
+  document.getElementById('mpOpenBtn').style.display = location.protocol==='file:' ? '' : 'none';
+  document.getElementById('mediaPathModal').classList.add('show');
+}
+function mpCopyPath(){
+  copyText(mpCurrentPath);
+  toast('路径已复制');
+}
+function mpOpenDir(){
+  if(!mpCurrentDirURL) return;
+  window.open('file:///' + mpCurrentDirURL.replace(/\\/g,'/').replace(/^\/+/,''));
+}
+function copyText(t){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).catch(()=>fallbackCopy(t));
+  } else fallbackCopy(t);
+}
+function fallbackCopy(t){
+  const ta = document.createElement('textarea');
+  ta.value = t; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  ta.remove();
+}
+document.addEventListener('click', hideMediaCtx);
+document.addEventListener('contextmenu', e=>{ if(!e.target.closest('.media-thumb')) hideMediaCtx(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') hideMediaCtx(); });
+window.addEventListener('scroll', hideMediaCtx, true);
+function renderEditorMedia(){
+  const grid = document.getElementById('mediaGrid');
+  grid.innerHTML = '';
+  editorMedia.forEach((m, i)=>{
+    const div = document.createElement('div');
+    div.className = 'media-thumb';
+    div.oncontextmenu = e=>showMediaCtx(e, m, ()=>removeMedia(i));
+    if(m.kind==='file'){
+      div.innerHTML = thumbHTML(m, mediaSrc(m));
+      div.onclick = ()=> openViewer(m);
+    } else {
+      MediaStore.get(m.id).then(rec=>{
+        if(!rec){ div.remove(); return; }
+        div.innerHTML = thumbHTML(m, objURL(rec.blob));
+        div.onclick = ()=> openViewer(m);
+      });
+    }
+    const del = document.createElement('button');
+    del.className='m-del'; del.textContent='✕'; del.title='删除';
+    del.onclick = e=>{ e.stopPropagation(); removeMedia(i); };
+    div.appendChild(del);
+    grid.appendChild(div);
+  });
+}
+async function openViewer(m){
+  let url, type;
+  if(m && m.kind==='file'){
+    url = mediaSrc(m); type = m.type;
+  } else {
+    const id = (m && m.id) || m;
+    const rec = await MediaStore.get(id); if(!rec) return;
+    url = objURL(rec.blob); type = rec.type;
+  }
+  document.getElementById('viewerContent').innerHTML = type==='video'
+    ? `<video src="${url}" controls autoplay></video>`
+    : `<img src="${url}" alt="">`;
+  document.getElementById('viewerOverlay').classList.add('show');
+}
+async function deleteMediaRefs(mediaList){
+  for(const m of (mediaList||[])){
+    try{
+      if(m.kind==='file'){
+        const dir = await getDirHandle(false);
+        if(dir) await dir.removeEntry(m.path.split('/').pop()).catch(()=>{});
+      } else if(m.id){
+        await MediaStore.del(m.id);
+      }
+    }catch(e){}
+  }
+}
+/* 详情页右键删除附件：删文件 + 移除引用 */
+async function deleteDetailMedia(idx){
+  const r = DB.rules.find(x=>x.id===state.detailRuleId); if(!r) return;
+  const m = (r.media||[])[idx]; if(!m) return;
+  if(!confirm('确定删除该附件吗？\n删除后底部会出现「撤销删除」按钮，可随时点击恢复；点 ✕ 放弃撤销后正式删除。')) return;
+  if(pendingUndo) finalizePending();
+  r.media.splice(idx, 1);
+  saveDB(); showDetail(r.id); refreshAll();
+  pendingUndo = { type:'media', item:m, index:idx, scope:'detail', ruleId:r.id };
+  showUndoBar('已删除附件「' + (m.name||'附件') + '」');
+}
+/* 备份导入：优先把文件型附件写回 file 文件夹，无权限则回落浏览器数据库 */
+async function mergeMediaEntries(list){
+  const existing = new Set((await MediaStore.all()).map(m=>m.id));
+  let mn = 0;
+  for(const m of (list||[])){
+    if(m.id && existing.has(m.id)) continue;
+    try{
+      if(m.kind==='file' && m.path && m.dataUrl){
+        const dir = await getDirHandle(false);
+        if(dir){
+          await writeFileToDir(dir, m.path.split('/').pop(), dataURLtoBlob(m.dataUrl));
+          mn++; continue;
+        }
+        await MediaStore.put({ id: uid()+'_m', blob: dataURLtoBlob(m.dataUrl), type:m.type, mime:m.mime, name:m.name });
+        mn++; continue;
+      }
+      if(m.dataUrl){
+        await MediaStore.put({ id: m.id || (uid()+'_m'), blob: dataURLtoBlob(m.dataUrl), type:m.type, mime:m.mime, name:m.name });
+        mn++;
+      }
+    }catch(err){}
+  }
+  return mn;
+}
+function closeViewer(){
+  document.getElementById('viewerOverlay').classList.remove('show');
+  document.getElementById('viewerContent').innerHTML = '';
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeViewer(); });
+/* 编辑弹窗内支持 Ctrl+V 粘贴截图/复制的文件 */
+document.addEventListener('paste', e=>{
+  const modal = document.getElementById('ruleModal');
+  if(!modal.classList.contains('show')) return;
+  const items = e.clipboardData && e.clipboardData.items;
+  if(!items) return;
+  const files = [];
+  for(const it of items){
+    if(it.kind==='file'){ const f = it.getAsFile(); if(f) files.push(f); }
+  }
+  if(files.length){ e.preventDefault(); addMediaFiles(files); toast(files.length===1?'已粘贴 1 个附件':`已粘贴 ${files.length} 个附件`); }
+});
+
+/* ================= 预置规范种子数据 ================= */
+const SEED = [
+ // 注塑成型
+ { cat:'注塑成型', title:'壁厚均匀性：避免缩水与变形', tags:'壁厚,缩水,变形', content:'1. 主壁厚建议 1.5~3.0mm（视产品大小），同件壁厚差控制在 ±20% 以内；\n2. 厚薄交接处用 R 角或斜面过渡，避免孤立厚区（热点）导致缩水凹痕；\n3. 无法避免的厚区可考虑掏空、减胶或增设浇口/运水。\n失效表现：表面缩痕、内部缩孔、尺寸超差、翘曲。', source:'通用DFM' },
+ { cat:'注塑成型', title:'拔模角：起模方向必须有斜度', tags:'拔模角,起模', content:'1. 一般拔模角 ≥ 0.5°~1°；深腔/深筋 ≥ 1°~2°；\n2. 咬花面每 0.025mm 纹路深度另加 ≥ 1° 拔模；\n3. 拔模方向应结合分模线、顶出方向统一确定，避免倒扣。\n失效表现：顶白、拉伤、粘模、脱模困难。', source:'通用DFM' },
+ { cat:'注塑成型', title:'加强筋：厚度 ≤ 0.6t，根部 R ≥ 0.3t', tags:'加强筋,缩水', content:'1. 筋厚 ≤ 相邻主壁厚 × 0.6（经验值 0.5~0.7t）；\n2. 筋高过大时考虑减胶槽或阶梯筋，防止填充困难与包气；\n3. 多筋交叉区域注意减胶（掏料）控制局部厚度。\n失效表现：筋背面缩水、表面外观不良。', source:'通用DFM' },
+ { cat:'注塑成型', title:'R 角：内外圆角 ≥ 0.3t', tags:'R角,应力集中', content:'1. 零 R 角（尖角）造成应力集中与填充不良，内外 R 建议 ≥ 0.3t；\n2. 外 R 与内 R 需协调：外 R = 内 R + t（等壁厚原则）；\n3. 受力部位（卡扣根、螺丝柱根、止口）优先加大 R。\n失效表现：开裂、断差处发白、短射。', source:'通用DFM' },
+ { cat:'注塑成型', title:'孔：盲孔深 ≤ 3~4D，孔边距 ≥ 1.5D', tags:'孔,顶针,镶件', content:'1. 盲孔深度 ≤ 3~4 倍孔径（深孔需型芯镶件+顶出设计）；\n2. 孔到边、孔到壁的距离 ≥ 1.5D，孔间距 ≥ 2D；\n3. 孔位尽量避开熔接痕敏感外观面；\n4. 横向孔需侧向抽芯或斜顶，注意模具成本与飞边风险。', source:'通用DFM' },
+ { cat:'注塑成型', title:'螺丝柱 Boss：外径 2~2.4 倍孔径，根部减胶', tags:'螺丝柱,自攻螺丝,缩水', content:'1. 自攻螺丝柱：孔径 ≈ 0.55~0.65 × 螺丝公称直径，外径 = 2~2.4 × 孔径；\n2. 柱子根部与壁连接处减胶掏空，防止背面缩水；孤立柱可加火山口或十字筋；\n3. 柱高过大（>30mm）考虑加强筋防偏摆；\n4. 螺丝扭入深度 ≥ 2 倍螺距圈数要求（一般 ≥ 6~8mm 啮合）。', source:'通用DFM' },
+ { cat:'注塑成型', title:'卡扣：悬臂卡扣根部应力控制', tags:'卡扣,装配,应力', content:'1. 悬臂卡扣根部厚度 ≤ 0.6~0.8t，根部 R ≥ 0.3t 防应力集中；\n2. 悬臂长度与挠度匹配：插入变形量 ≤ 允许应变（PC≈4%，ABS≈3%，PP≈6%）；\n3. 设计导入角（30°~45°）与拔出角（≈90°或带解锁结构）；\n4. 卡扣位置避开浇口与熔接痕；考虑模具斜顶/行位出模。', source:'通用DFM' },
+ { cat:'注塑成型', title:'熔接痕控制：外观面避免对冲', tags:'熔接痕,外观,浇口', content:'1. 浇口位置决定熔接痕走向，外观面避免两股料流对冲；\n2. 孔位后方易产生熔接痕，孔径越大越明显，可增加导流结构或调整浇口；\n3. 咬花、晒纹可弱化熔接痕可见度；\n4. 关键外观件需 Moldflow 分析确认。', source:'项目复盘' },
+ { cat:'注塑成型', title:'顶出设计：顶针位避开外观面', tags:'顶针,顶白,模具', content:'1. 顶针优先布置在非外观面、R角内侧、筋和柱底部；\n2. 外观面确需顶出时用扁顶针/阶梯顶针并控制配合间隙防飞边；\n3. 深腔件注意真空吸附（顶出困难），可加倒扣释放或进气阀；\n4. 顶针有效接触面积需足够，防止顶白、顶穿。', source:'通用DFM' },
+ // 钣金冲压
+ { cat:'钣金冲压', title:'折弯内 R ≥ 1t（按材料），90° 最小折边高度 ≥ 3.5t', tags:'折弯,钣金', content:'1. 折弯内 R：SPCC/SECC ≥ 1t，铝板 ≥ 1.5t（防裂纹），不锈钢 ≥ 1t；\n2. 最小折边高度 ≥ 折弯下模槽宽的一半 + 内 R，一般取 ≥ 3.5t；\n3. 折弯区附近 2.5t + R 范围内避免孔、缺口（先折弯后冲孔可放宽）；\n4. 反折压平（死边）需板厚 ≤ 1.5mm 且留回弹余量。', source:'通用DFM' },
+ { cat:'钣金冲压', title:'冲孔最小孔径 ≥ 板厚（一般 ≥ 1.2t）', tags:'冲孔,钣金', content:'1. 常规冲裁最小孔径 ≥ 1.2t（特殊模具可达 0.8t）；\n2. 孔边距（孔到外边/到折弯线）≥ 2.5t + R；\n3. 冲裁间隙按材料厚度 5%~10% 单边；\n4. 螺丝过孔与沉头孔尺寸查表确认（沉头深度 ≈ 螺丝头高 + 0.2~0.3mm）。', source:'通用DFM' },
+ { cat:'钣金冲压', title:'展开计算：K 因子与工艺补偿', tags:'展开,折弯,K因子', content:'1. 展开长度 = L1 + L2 + K 因子补偿（中性层系数 K ≈ 0.3~0.5，视 R/t 与材料）；\n2. 多次折弯需考虑干涉，折弯顺序与模具可达性先行评估；\n3. 精密件建议与钣金厂确认其刀具规格后出展开图；\n4. 展开图需标注材料纹向（对回弹和强度有影响）。', source:'通用DFM' },
+ { cat:'钣金冲压', title:'钣金防错与结构对称性', tags:'防呆,装配,钣金', content:'1. 外形允许时利用非对称孔位、缺口做防呆，避免装反；\n2. 相近尺寸的对称件若无方向要求，尽量统一规格减少错料；\n3. 焊接/铆接螺母位置避开折弯区并预留压铆模具空间；\n4. 屏蔽罩、盖板需留出扣位和拆卸工具空间。', source:'项目复盘' },
+ // 压铸/CNC
+ { cat:'压铸/CNC', title:'压铸件：拔模 1°~2°，壁厚 2~4mm', tags:'压铸,拔模,壁厚', content:'1. 压铸均匀壁厚 2~4mm，厚区抽真空/局部挤压防缩孔；\n2. 拔模角 ≥ 1°~2°（铝），深腔加大；\n3. 螺纹孔优先预铸底孔后机加，或预铸嵌件；\n4. 避免尖角（热裂），R ≥ 1mm；加工基准面统一约定。', source:'通用DFM' },
+ { cat:'压铸/CNC', title:'CNC 特征：内 R 受刀具半径限制', tags:'CNC,刀具,R角', content:'1. 型腔内 R ≥ 刀具半径（常用 R0.5/R1/R2），底部清角需求需电火花或刀补说明；\n2. 深径比 > 5 的深孔/深腔加工成本剧增，尽量改结构或分件；\n3. 统一孔径规格减少换刀次数；\n4. 装夹基准、加工正反面需在图纸明确。', source:'通用DFM' },
+ // 连接与装配
+ { cat:'连接与装配', title:'螺丝锁付：沉头/凸头选择与间隙', tags:'螺丝,装配,间隙', content:'1. 自攻螺丝孔径按材料查表（PP/ABS 不同），过紧滑牙、过松不紧；\n2. 凸头螺丝孔边距 ≥ 1.5D，沉头孔周边壁厚足够防崩边；\n3. 螺丝柱与对应过孔不同心度需在公差链内（一般 ≤ 0.3mm）；\n4. 高频拆装或受力部位用机牙+铜螺母/预埋螺母。', source:'通用DFM' },
+ { cat:'连接与装配', title:'公差配合：间隙/过渡/过盈选择', tags:'公差,配合,尺寸链', content:'1. 止口定位常用 H8/f8~H9/d9 级间隙配合；精密外观间隙配合需做尺寸链分析；\n2. 过盈配合（压装）注意材料蠕变与应力松弛（塑料件长期保持力下降）；\n3. 多件累积公差用基准统一 + 关键尺寸标注管控；\n4. 外观件面差、段差建议 ≤ 0.15mm，缝隙均匀性重点管控。', source:'通用DFM' },
+ { cat:'连接与装配', title:'防呆设计：结构唯一性', tags:'防呆,装配', content:'1. 对称外形但内部有方向性的，用不对称卡扣/定位柱区分；\n2. 排线、PCB 插入方向需有唯一通道；\n3. FPC/线缆走线预留弯曲半径（FPC ≥ 6~10 倍线厚）；\n4. 装配顺序模拟：确认每一步工具可达、手可操作、无干涉。', source:'项目复盘' },
+ { cat:'连接与装配', title:'装配间隙与段差管控', tags:'间隙,外观,装配', content:'1. 面差（段差）0 或 ≤ 0.1mm（高端外观 0 断差），缝隙 0.15~0.3mm；\n2. 缝隙处考虑遮蔽内部（防漏光、防进灰）；\n3. 卡扣+螺丝混合固定时先卡后锁，锁付顺序防变形（对角顺序）；\n4. 大平面件防翘曲：多点定位 + 弹性卡扣吸收变形。', source:'项目复盘' },
+ // 表面处理
+ { cat:'表面处理', title:'喷涂/电镀：分界与遮蔽位预留', tags:'喷涂,电镀,外观', content:'1. 喷涂分界尽量放在分模线、段差或凹槽处，便于遮蔽；\n2. 电镀件需导电挂点，位置在外观不可见处；\n3. 喷涂面避免深腔死角（上漆不均）；高光面避免顶针痕；\n4. 咬花/晒纹深度与拔模角匹配（每 0.025mm 纹深加 1° 拔模）。', source:'通用DFM' },
+ { cat:'表面处理', title:'丝印/镭雕：位置与底材适配', tags:'丝印,镭雕,标识', content:'1. 丝印区尽量为平面或大曲率面，避让顶针位与分模线；\n2. 镭雕适合深色底浅色字或添加镭雕母粒；\n3. 按键丝印考虑磨损（透光+真空镀可提升寿命）；\n4. 标识需满足认证要求（安规、环保标识位置预留）。', source:'通用DFM' },
+ // 密封与防水
+ { cat:'密封与防水', title:'防水密封：压缩量与止口设计', tags:'防水,密封圈,IP等级', content:'1. 硅胶圈压缩量：静态密封 20%~30%，线径越细取高值；\n2. 密封槽截面积 ≥ 密封圈截面积（防压死），槽面粗糙度 Ra ≤ 1.6；\n3. 止口+密封圈双保险：先止口定位再压缩密封；\n4. IP54 及以上需评估透气（防水透气膜）平衡气压；\n5. 螺丝锁付力需保证密封压缩均匀（锁付顺序与扭力管控）。', source:'通用DFM' },
+ { cat:'密封与防水', title:'防水结构测试：仿真之外必须做实测', tags:'防水,测试', content:'1. 首板做喷淋/浸泡验证，重点检查螺丝孔、卡扣缝、按键；\n2. 气压测试（负压检漏）定位泄漏点比水测更直观；\n3. 温循后复测密封（材料收缩会放大缝隙）；\n4. 密封圈老化数据留档，写入知识库复用。', source:'项目复盘' },
+ // 通用结构
+ { cat:'通用结构', title:'选材速查：常用材料关键特性', tags:'选材,材料', content:'ABS：易加工、电镀好、耐候一般；PC：强度高、耐冲击、易应力开裂（需退火/控油）；\nPP：耐折弯（活页）、耐化好、缩水率大（1.5%~2%）；\nPA+GF：强度高、尺寸稳定、易浮纤（外观件慎用）；\n铝合金：导热好、阳极氧化外观佳、CNC/压铸为主；\n不锈钢 SUS304：防锈通用，SUS301 弹性好（弹片）。', source:'通用DFM' },
+ { cat:'通用结构', title:'缩水率与模具尺寸预放', tags:'缩水率,模具,尺寸', content:'常用缩水率：PC/ABS 0.4%~0.6%，ABS 0.4%~0.7%，PC 0.5%~0.7%，POM 1.8%~2.5%，PP 1.2%~2.0%，PA+GF30 0.3%~0.8%（视玻纤方向异性）；\n同一件不同方向缩水不同（玻纤取向），关键孔位需按实测修正模具。', source:'通用DFM' },
+ { cat:'通用结构', title:'结构评审自查清单（提交前的 10 项）', tags:'评审,检查,流程', content:'1. 分模线/出模方向是否明确？有无倒扣？\n2. 壁厚是否均匀？厚区是否减胶？\n3. 拔模角是否足够？咬花面是否补偿？\n4. 卡扣/螺丝柱根部是否防缩水？\n5. 公差链是否分析？基准是否统一？\n6. 装配顺序与工具可达是否模拟过？\n7. 防呆是否覆盖所有方向性件？\n8. 外观面（缩水/熔接痕/顶白/飞边）是否逐面评估？\n9. 与历史失败案例对比有无同类风险？\n10. 是否与模具/工艺同事做过可行性沟通？', source:'自建流程' },
+];
+
+/* ================= 通用 UI ================= */
+function toast(msg, ms){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer); t._timer = setTimeout(()=>t.classList.remove('show'), ms||1800);
+}
+function switchView(v){
+  state.view = v;
+  document.querySelectorAll('.nav-tabs button').forEach(b=>b.classList.toggle('active', b.dataset.view===v));
+  document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active', el.id==='view-'+v));
+  if(v==='checks') renderCheckList();
+  if(v==='flow') renderFlow();
+  if(v==='data') renderData();
+}
+document.querySelectorAll('.nav-tabs button').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.modal-mask').forEach(m=>{
+  m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('show'); });
+});
+function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function fmtTime(iso){ try{ return new Date(iso).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+
+/* ================= 规范库 ================= */
+function filteredRules(){
+  const q = state.search.trim().toLowerCase();
+  return DB.rules.filter(r=>{
+    if(state.cat!=='all' && r.cat!==state.cat) return false;
+    if(q){
+      const hay = (r.title+' '+(r.content||'')+' '+(r.tags||'')+' '+(r.cat||'')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b)=>{
+    if(state._sort==='title') return (a.title||'').localeCompare(b.title||'','zh');
+    if(state._sort==='cat') return (a.cat||'').localeCompare(b.cat||'','zh') || (b.updatedAt||'').localeCompare(a.updatedAt||'');
+    return (b.updatedAt||b.createdAt||'').localeCompare(a.updatedAt||a.createdAt||'');
+  });
+}
+function renderSidebar(){
+  const counts = {};
+  DB.rules.forEach(r=>{ counts[r.cat] = (counts[r.cat]||0)+1; });
+  let html = '';
+  CATS.forEach(c=>{
+    const n = counts[c]||0;
+    if(state.cat==='all' || state.cat===c || n>0){
+      html += `<div class="cat-item ${state.cat===c?'active':''}" data-cat="${c}"><span>${c}</span><span class="count">${n}</span></div>`;
+    }
+  });
+  document.getElementById('catList').innerHTML = html;
+  document.getElementById('countAll').textContent = DB.rules.length;
+  document.querySelectorAll('.cat-item').forEach(el=>{
+    el.onclick = ()=>{ state.cat = el.dataset.cat; renderSidebar(); renderRules(); };
+  });
+  document.getElementById('sidebarStats').textContent = `规范 ${DB.rules.length} 条 · 清单 ${DB.checks.length} 份`;
+}
+function renderRules(){
+  const list = filteredRules();
+  document.getElementById('rulesTitle').textContent = state.cat==='all' ? '全部规范' : state.cat;
+  document.getElementById('rulesSub').textContent = state.search ? `搜索"${state.search}"的结果` : '点击卡片查看详情，双击可快速编辑';
+  document.getElementById('ruleCountLabel').textContent = `共 ${list.length} 条`;
+  const grid = document.getElementById('ruleGrid');
+  if(!list.length){
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1">暂无规范。点击右上角"新增规范"开始积累你的知识，或在数据管理中载入预置规范。</div>';
+    return;
+  }
+  grid.innerHTML = list.map(r=>`
+    <div class="rule-card" data-id="${r.id}">
+      <div class="rc-top"><h3>${esc(r.title)}</h3><span class="cat-badge">${esc(r.cat)}</span></div>
+      <p>${esc((r.content||'').split('\n')[0])}</p>
+      <div class="tags">${(r.tags||'').split(/[,，]/).filter(Boolean).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <div style="font-size:11.5px;color:var(--text-3)">${r.source?'来源：'+esc(r.source)+' · ':''}${fmtTime(r.updatedAt||r.createdAt)}${Array.isArray(r.media)&&r.media.length? ' · 📎'+r.media.length:''}</div>
+    </div>`).join('');
+  grid.querySelectorAll('.rule-card').forEach(card=>{
+    const rule = DB.rules.find(r=>r.id===card.dataset.id);
+    card.onclick = ()=> showDetail(rule.id);
+    card.ondblclick = ()=> openRuleEditor(rule.id);
+  });
+}
+document.getElementById('globalSearch').oninput = e=>{
+  state.search = e.target.value;
+  if(state.view!=='rules') switchView('rules');
+  renderRules();
+};
+document.getElementById('sortSelect').onchange = e=>{ state._sort = e.target.value; renderRules(); };
+
+/* ---- 规范编辑 ---- */
+function openRuleEditor(id){
+  state.editingRuleId = id||null;
+  document.getElementById('ruleModalTitle').textContent = id?'编辑规范':'新增规范';
+  const sel = document.getElementById('fCat');
+  sel.innerHTML = CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
+  const r = id? DB.rules.find(x=>x.id===id) : null;
+  document.getElementById('fTitle').value = r?r.title:'';
+  document.getElementById('fCat').value = r?r.cat:'注塑成型';
+  document.getElementById('fTags').value = r?r.tags||'':'';
+  document.getElementById('fContent').value = r?r.content||'':'';
+  document.getElementById('fSource').value = r?r.source||'':'';
+  editorMedia = (r && Array.isArray(r.media))? r.media.map(m=>({...m})) : [];
+  pendingMediaIds = [];
+  renderEditorMedia();
+  document.getElementById('ruleModal').classList.add('show');
+  document.getElementById('fTitle').focus();
+}
+function closeRuleEditor(){
+  // 取消编辑：清理本次新加但未保存的媒体，避免产生孤立文件
+  pendingMediaIds.forEach(id=>MediaStore.del(id));
+  pendingMediaIds = [];
+  // 取消时若还有「移除附件」待结算：直接放弃结算、不删文件（规范里仍保留该附件）
+  if(pendingUndo && pendingUndo.type==='media' && pendingUndo.scope==='editor'){
+    pendingUndo = null; hideUndoBar();
+  }
+  closeModal('ruleModal');
+}
+function saveRule(){
+  const title = document.getElementById('fTitle').value.trim();
+  if(!title){ toast('请填写标题'); return; }
+  const data = {
+    title,
+    cat: document.getElementById('fCat').value,
+    tags: document.getElementById('fTags').value.trim(),
+    content: document.getElementById('fContent').value,
+    source: document.getElementById('fSource').value.trim(),
+    media: editorMedia.slice(),
+  };
+  if(state.editingRuleId){
+    const r = DB.rules.find(x=>x.id===state.editingRuleId);
+    Object.assign(r, data, { updatedAt: now() });
+    toast('已保存');
+  } else {
+    DB.rules.unshift(Object.assign(data, { id: uid(), createdAt: now(), updatedAt: now() }));
+    toast('已新增规范');
+  }
+  pendingMediaIds = [];  // 已归属规范，取消清理时不删除
+  // 保存时正式结算本次编辑中移除的附件（文件已不在规范里，真正删除）
+  if(pendingUndo && pendingUndo.type==='media' && pendingUndo.scope==='editor'){
+    finalizePending(); hideUndoBar();
+  }
+  saveDB(); closeModal('ruleModal'); refreshAll();
+  if(state.detailRuleId) showDetail(state.editingRuleId||state.detailRuleId);
+}
+/* ---- 规范详情 ---- */
+function showDetail(id){
+  const r = DB.rules.find(x=>x.id===id); if(!r) return;
+  state.detailRuleId = id;
+  document.getElementById('dtTitle').textContent = r.title;
+  document.getElementById('dtCat').textContent = r.cat;
+  document.getElementById('dtTags').innerHTML = (r.tags||'').split(/[,，]/).filter(Boolean).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+  document.getElementById('dtContent').textContent = r.content||'';
+  const dtm = document.getElementById('dtMedia');
+  dtm.innerHTML = '';
+  const mediaList = Array.isArray(r.media)? r.media : [];
+  if(!mediaList.length){ dtm.style.display='none'; }
+  else {
+    dtm.style.display='flex';
+    mediaList.forEach((m, idx)=>{
+      const div = document.createElement('div');
+      div.className = 'media-thumb';
+      div.oncontextmenu = e=>showMediaCtx(e, m, ()=>deleteDetailMedia(idx));
+      if(m.kind==='file'){
+        div.innerHTML = thumbHTML(m, mediaSrc(m));
+        div.onclick = ()=> openViewer(m);
+      } else {
+        MediaStore.get(m.id).then(rec=>{
+          if(!rec){ div.remove(); return; }
+          div.innerHTML = thumbHTML(m, objURL(rec.blob));
+          div.onclick = ()=> openViewer(m);
+        });
+      }
+      dtm.appendChild(div);
+    });
+  }
+  document.getElementById('dtMeta').textContent = (r.source?'来源：'+r.source+' · ':'') + '创建 '+fmtTime(r.createdAt) + (r.updatedAt?' · 更新 '+fmtTime(r.updatedAt):'');
+  document.getElementById('detailModal').classList.add('show');
+}
+function editFromDetail(){
+  const id = state.detailRuleId;
+  closeModal('detailModal'); openRuleEditor(id);
+}
+function deleteRuleFromDetail(){
+  if(!confirm('确定删除这条规范吗？已生成的检查清单中的条目不受影响。\n删除后底部会出现「撤销删除」按钮，可随时点击恢复；点 ✕ 放弃撤销后正式删除。')) return;
+  if(pendingUndo) finalizePending(); /* 结算上一次待撤销的删除（清理其附件） */
+  const idx = DB.rules.findIndex(x=>x.id===state.detailRuleId);
+  if(idx < 0) return;
+  const r = DB.rules[idx];
+  DB.rules.splice(idx, 1);
+  saveDB(); closeModal('detailModal'); refreshAll();
+  /* 暂存待撤销：附件（磁盘文件/数据库）延迟到撤销期结束后才真正删除 */
+  pendingUndo = { type:'rule', rule: r, index: idx };
+  showUndoBar('已删除规范「' + (r.title||'未命名') + '」');
+}
+/* ---- 删除撤销（规范 / 附件通用）：无时间限制，手动关闭 ---- */
+let pendingUndo = null;   /* {type:'rule',rule,index} 或 {type:'media',item,index,scope:'editor'|'detail',ruleId} */
+function showUndoBar(msg){
+  document.getElementById('undoMsg').textContent = msg;
+  document.getElementById('undoBar').classList.add('show');
+}
+function hideUndoBar(){
+  document.getElementById('undoBar').classList.remove('show');
+}
+function undoDeleteRule(){
+  if(!pendingUndo) return;
+  const p = pendingUndo; pendingUndo = null;
+  if(p.type==='rule'){
+    DB.rules.splice(Math.min(p.index, DB.rules.length), 0, p.rule);
+    saveDB(); refreshAll();
+    toast('已撤销删除，规范已恢复');
+  } else if(p.scope==='editor'){
+    if(!document.getElementById('ruleModal').classList.contains('show')){ hideUndoBar(); return; }
+    editorMedia.splice(Math.min(p.index, editorMedia.length), 0, p.item);
+    renderEditorMedia();
+    toast('已撤销删除，附件已恢复');
+  } else {
+    const r = DB.rules.find(x=>x.id===p.ruleId);
+    if(r){
+      r.media = r.media||[];
+      r.media.splice(Math.min(p.index, r.media.length), 0, p.item);
+      saveDB(); refreshAll();
+      if(state.detailRuleId===p.ruleId && document.getElementById('detailModal').classList.contains('show')) showDetail(p.ruleId);
+      toast('已撤销删除，附件已恢复');
+    }
+  }
+  hideUndoBar();
+}
+/* 撤销期结束 / 放弃撤销：真正清理附件文件 */
+function finalizePending(){
+  if(!pendingUndo) return;
+  const p = pendingUndo; pendingUndo = null;
+  if(p.type==='rule'){
+    if(Array.isArray(p.rule.media)) deleteMediaRefs(p.rule.media);
+  } else {
+    deleteMediaRefs([p.item]);
+    if(p.item.kind==='file' && p.item.path) delete fileMediaURLs[p.item.path];
+    pendingMediaIds = pendingMediaIds.filter(x=>x!==p.item.id);
+  }
+}
+function finalizeDelete(){ finalizePending(); }
+
+/* ================= 检查清单 ================= */
+function renderCheckList(){
+  const wrap = document.getElementById('ckList');
+  if(!DB.checks.length){
+    wrap.innerHTML = '<div class="empty">还没有检查清单。点击"新建检查清单"，选择分类后自动载入对应规范作为检查项。</div>';
+    return;
+  }
+  wrap.innerHTML = DB.checks.map(c=>{
+    const total = c.items.length;
+    const done = c.items.filter(i=>i.state!=='').length;
+    const risk = c.items.filter(i=>i.state==='risk').length;
+    const pct = total? Math.round(done/total*100):0;
+    return `<div class="ck-card" data-id="${c.id}">
+      <div style="flex:1">
+        <div class="ck-name">${esc(c.name)}</div>
+        <div class="ck-meta">${c.createdAt?fmtTime(c.createdAt):''} · ${total} 项 · 已查 ${done} 项 ${risk?` · <span style="color:var(--orange)">${risk} 项有风险</span>`:''}</div>
+        <div class="ck-actions" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="event.stopPropagation(); editCheck('${c.id}')">✎ 编辑</button>
+          <button class="btn btn-sm" onclick="event.stopPropagation(); copyCheck('${c.id}')">⧉ 复制</button>
+          <button class="btn btn-sm" onclick="event.stopPropagation(); backupCheck('${c.id}')">⬇ 备份</button>
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteCheckFromList('${c.id}')">✕ 删除</button>
+        </div>
+      </div>
+      <div class="progress" style="max-width:160px"><div class="progress-bar" style="width:${pct}%"></div></div>
+      <div style="font-size:13px;color:var(--text-2);width:42px;text-align:right">${pct}%</div>
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('.ck-card').forEach(card=>card.onclick=()=>runCheck(card.dataset.id));
+}
+/* ---- 清单操作：复制 / 编辑 / 删除 / 备份 / 导入 ---- */
+let editingCkId = null;
+function copyCheck(id){
+  const c = DB.checks.find(x=>x.id===id); if(!c) return;
+  const copy = JSON.parse(JSON.stringify(c));
+  copy.id = uid(); copy.name = c.name + ' 副本'; copy.createdAt = now();
+  DB.checks.unshift(copy); saveDB(); renderCheckList(); toast('已复制为「'+copy.name+'」');
+}
+function deleteCheckFromList(id){
+  const c = DB.checks.find(x=>x.id===id); if(!c) return;
+  if(!confirm(`确定删除检查清单「${c.name}」？删除后不可恢复（可用备份功能先行导出）。`)) return;
+  DB.checks = DB.checks.filter(x=>x.id!==id);
+  saveDB(); renderCheckList(); toast('已删除');
+}
+function backupCheck(id){
+  const c = DB.checks.find(x=>x.id===id); if(!c) return;
+  const payload = { rules: [], checks: [c], exportedAt: now() };
+  const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const fname = c.name.replace(/[\\/:*?"<>|]/g,'_').slice(0,50) || '检查清单';
+  a.download = '清单备份_'+fname+'_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('已导出清单备份，可在本页或数据管理中导入');
+}
+function importCheck(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!Array.isArray(data.checks) || !data.checks.length){ toast('文件中没有检查清单'); return; }
+      let cn=0, rn=0, mn=0;
+      // 顺带合并文件里可能包含的规范与附件（与全局备份格式兼容）
+      const rids = new Set(DB.rules.map(r=>r.id));
+      (data.rules||[]).forEach(r=>{ if(!rids.has(r.id)){ DB.rules.push(r); rn++; } });
+      const cids = new Set(DB.checks.map(c=>c.id));
+      data.checks.forEach(c=>{ if(!cids.has(c.id)){ DB.checks.push(c); cn++; } });
+      mn = await mergeMediaEntries(data.media);
+      saveDB(); renderCheckList();
+      if(state.view==='data') renderData();
+      toast(cn? `已导入 ${cn} 份清单${rn?'、'+rn+' 条规范':''}` : '清单已存在，未重复导入');
+    }catch(err){ toast('文件格式不正确'); }
+  };
+  reader.readAsText(file);
+}
+/* ---- 编辑清单：条目内联编辑 + 窗口化 ---- */
+let itemEdits = {};   // rid -> {title, content} 本清单内的修改（不回写规范库）
+let erData = {};      // rid -> {title, content} 行初始数据
+function editCheck(id){
+  editingCkId = id;
+  itemEdits = {}; erData = {};
+  const c = DB.checks.find(x=>x.id===id); if(!c) return;
+  document.getElementById('ckEditName').value = c.name;
+  document.getElementById('ckEditBox').classList.remove('full');
+  const itemMap = new Map(c.items.map(i=>[i.ruleId, i]));
+  let html = '';
+  CATS.forEach(cat=>{
+    const rules = DB.rules.filter(r=>r.cat===cat);
+    if(!rules.length) return;
+    html += `<div style="font-size:12px;color:var(--text-3);margin:8px 0 4px;font-weight:600">${cat}</div>`;
+    rules.forEach(r=>{
+      const it = itemMap.get(r.id);
+      erData[r.id] = { title: (it&&it.title)||r.title, content: (it&&it.content)||r.content||'' };
+      html += erRow(r.id, erData[r.id].title, !!it, !!(it&&it.edited));
+    });
+  });
+  const orphans = c.items.filter(i=>!DB.rules.some(r=>r.id===i.ruleId));
+  if(orphans.length){
+    html += `<div style="font-size:12px;color:var(--text-3);margin:8px 0 4px;font-weight:600">旧条目（原规范已删除）</div>`;
+    orphans.forEach(i=>{
+      erData[i.ruleId] = { title: i.title, content: i.content||'' };
+      html += erRow(i.ruleId, i.title, true, !!i.edited);
+    });
+  }
+  document.getElementById('ckEditRules').innerHTML = html;
+  document.getElementById('ckEditModal').classList.add('show');
+}
+function erRow(rid, title, checked, edited){
+  return `<div class="er-row" data-rid="${esc(rid)}">
+    <div class="er-main">
+      <span class="er-title" id="ert_${esc(rid)}">${esc(title)}${edited?'<span class="er-badge">已修改</span>':''}</span>
+      <div class="er-editor" id="ede_${esc(rid)}">
+        <input id="edt_${esc(rid)}" placeholder="条目标题" oninput="trackItemEdit('${esc(rid)}')">
+        <div style="position:relative">
+          <textarea id="edc_${esc(rid)}" placeholder="条目内容（参数建议 / 适用条件 / 失效后果…）" oninput="trackItemEdit('${esc(rid)}')"></textarea>
+          <button type="button" class="tr-btn" id="tr_${esc(rid)}" title="翻译：在每句英文下方生成中文译文" onclick="translateItemContent('${esc(rid)}')">译</button>
+        </div>
+        <div class="er-hint">修改仅应用到本清单的检查项，不会改动规范库原文；点「译」不替换原文，译文「→」显示在对应句子下方</div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-sm" onclick="toggleItemEditor('${esc(rid)}')">✎ 编辑</button>
+    <label class="er-check" title="勾选纳入清单"><input type="checkbox" value="${esc(rid)}" ${checked?'checked':''}></label>
+  </div>`;
+}
+function toggleItemEditor(rid){
+  const ed = document.getElementById('ede_'+rid);
+  if(!ed) return;
+  const opening = ed.style.display!=='block';
+  ed.style.display = opening?'block':'none';
+  if(opening){
+    const cur = itemEdits[rid] || erData[rid] || {title:'',content:''};
+    document.getElementById('edt_'+rid).value = cur.title;
+    document.getElementById('edc_'+rid).value = cur.content;
+  }
+}
+function trackItemEdit(rid){
+  itemEdits[rid] = { title: document.getElementById('edt_'+rid).value, content: document.getElementById('edc_'+rid).value };
+  const base = erData[rid] || {title:'',content:''};
+  const changed = itemEdits[rid].title!==base.title || itemEdits[rid].content!==base.content;
+  const t = document.getElementById('ert_'+rid);
+  if(t){
+    t.innerHTML = esc(itemEdits[rid].title || base.title || '') + (changed?'<span class="er-badge">已修改</span>':'');
+  }
+}
+function saveCheckEdit(){
+  const c = DB.checks.find(x=>x.id===editingCkId); if(!c) return;
+  const name = document.getElementById('ckEditName').value.trim();
+  if(!name){ toast('请填写项目名称'); return; }
+  c.name = name;
+  const selected = [...document.querySelectorAll('#ckEditRules input:checked')].map(i=>i.value);
+  c.items = c.items.filter(i=>selected.includes(i.ruleId));
+  // 应用条目编辑
+  c.items.forEach(i=>{
+    const ed = itemEdits[i.ruleId];
+    if(ed){ i.title = ed.title; i.content = ed.content; i.edited = true; }
+  });
+  const have = new Set(c.items.map(i=>i.ruleId));
+  selected.forEach(rid=>{
+    if(have.has(rid)) return;
+    const r = DB.rules.find(x=>x.id===rid);
+    if(r){
+      const ed = itemEdits[rid];
+      c.items.push({ ruleId:r.id, title: ed?ed.title:r.title, content: ed?ed.content:(r.content||''), cat:r.cat, state:'', note:'', edited: !!ed });
+    }
+  });
+  saveDB(); closeModal('ckEditModal');
+  document.getElementById('winMiniBar').style.display='none';
+  renderCheckList();
+  if(state.runningCheckId===editingCkId) renderCkItems();
+  toast('清单已更新，共 '+c.items.length+' 项');
+}
+/* ---- 英译中：单击「译」按钮，结果写回内容框 ---- */
+function splitChunks(text, max){
+  const parts=[]; let cur='';
+  for(const line of text.split('\n')){
+    let l = line;
+    while(l.length>max){ if(cur){ parts.push(cur); cur=''; } parts.push(l.slice(0,max)); l=l.slice(max); }
+    if((cur+'\n'+l).length>max && cur){ parts.push(cur); cur=l; }
+    else cur = cur? cur+'\n'+l : l;
+  }
+  if(cur) parts.push(cur);
+  return parts;
+}
+async function gtxTranslate(text){
+  const res = await fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q='+encodeURIComponent(text));
+  if(!res.ok) throw new Error('gtx '+res.status);
+  const data = await res.json();
+  const out = (data[0]||[]).map(x=>x&&x[0]||'').join('');
+  if(!out) throw new Error('gtx empty');
+  return out;
+}
+async function myMemoryTranslate(text){
+  const res = await fetch('https://api.mymemory.translated.net/get?langpair=en|zh-CN&q='+encodeURIComponent(text));
+  if(!res.ok) throw new Error('mm '+res.status);
+  const data = await res.json();
+  const out = data && data.responseData && data.responseData.translatedText;
+  if(!out) throw new Error('mm empty');
+  return out;
+}
+async function translateEnToZh(text){
+  const chunks = splitChunks(text, 1200);
+  const outs = [];
+  for(const c of chunks){
+    try { outs.push(await gtxTranslate(c)); }
+    catch(e){ outs.push(await myMemoryTranslate(c)); }
+  }
+  return outs.join('');
+}
+function hasEnglish(s){
+  const letters = (s.match(/[A-Za-z]/g)||[]).length;
+  const body = s.replace(/\s/g,'');
+  return letters >= 3 && body.length>0 && letters/body.length > 0.3;
+}
+async function translateItemContent(rid){
+  const ta = document.getElementById('edc_'+rid);
+  if(!ta) return;
+  const text = ta.value.trim();
+  if(!text){ toast('没有可翻译的内容'); return; }
+  if(!navigator.onLine){ toast('当前离线，无法翻译'); return; }
+  const btn = document.getElementById('tr_'+rid);
+  btn.disabled = true; btn.textContent = '…';
+  try{
+    // 不替换原文：逐句翻译，译文以「→」放在对应句子下方
+    const lines = ta.value.split('\n');
+    const out = [];
+    let translated = 0;
+    for(const line of lines){
+      const t = line.trim();
+      if(!t){ out.push(''); continue; }
+      if(!hasEnglish(t)){ out.push(line); continue; }
+      try{
+        const zh = await translateEnToZh(t);
+        if(zh && zh.trim()){ out.push(line); out.push('→ ' + zh.trim()); translated++; continue; }
+      }catch(e){}
+      out.push(line);
+    }
+    if(translated){ ta.value = out.join('\n'); trackItemEdit(rid); toast(`翻译完成，已在 ${translated} 句原文下方生成中文译文`); }
+    else toast('未检测到需要翻译的英文内容');
+  }catch(e){ toast('翻译失败，请检查网络后重试'); }
+  btn.disabled = false; btn.textContent = '译';
+}
+/* ---- 编辑清单窗口：最小化 / 恢复 / 关闭 / 全屏切换 ---- */
+function winToggleFull(){
+  const box = document.getElementById('ckEditBox');
+  const mask = document.getElementById('ckEditModal');
+  box.classList.toggle('full');
+  mask.classList.toggle('fullmask', box.classList.contains('full'));
+}
+function minimizeCkEdit(){
+  closeModal('ckEditModal');
+  const c = DB.checks.find(x=>x.id===editingCkId);
+  document.getElementById('winMiniText').textContent = '正在编辑：'+(c?c.name:'清单');
+  document.getElementById('winMiniBar').style.display='flex';
+}
+function restoreCkEdit(){
+  document.getElementById('winMiniBar').style.display='none';
+  document.getElementById('ckEditModal').classList.add('show');
+}
+function closeCkEdit(){
+  closeModal('ckEditModal');
+  document.getElementById('winMiniBar').style.display='none';
+}
+/* 标题栏长按拖动：移动窗口位置 */
+(function(){
+  const mask = document.getElementById('ckEditModal');
+  const box = document.getElementById('ckEditBox');
+  const header = box.querySelector('.win-header');
+  let dragging=false, sx=0, sy=0, ox=0, oy=0;
+  header.addEventListener('mousedown', e=>{
+    if(e.target.closest('.win-btns')) return;          // 按钮不触发拖动
+    if(box.classList.contains('full')) return;         // 全屏模式不可拖动
+    const r = box.getBoundingClientRect();
+    dragging=true; sx=e.clientX; sy=e.clientY; ox=r.left; oy=r.top;
+    box.style.position='fixed'; box.style.margin='0';
+    box.style.left=r.left+'px'; box.style.top=r.top+'px';
+    document.body.style.cursor='move';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e=>{
+    if(!dragging) return;
+    const w=box.offsetWidth, h=box.offsetHeight;
+    const nx=Math.min(Math.max(ox+e.clientX-sx, -w+100), window.innerWidth-100);
+    const ny=Math.min(Math.max(oy+e.clientY-sy, 0), window.innerHeight-40);
+    box.style.left=nx+'px'; box.style.top=ny+'px';
+  });
+  document.addEventListener('mouseup', ()=>{ if(dragging){ dragging=false; document.body.style.cursor=''; } });
+})();
+function openNewCheck(){
+  const box = document.getElementById('ckCatPick');
+  box.innerHTML = CATS.map(c=>{
+    const n = DB.rules.filter(r=>r.cat===c).length;
+    return `<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+      <input type="checkbox" value="${c}" ${n? '' : 'disabled'}> ${c} <span style="color:var(--text-3);font-size:12px">(${n})</span></label>`;
+  }).join('');
+  document.getElementById('ckName').value = '';
+  document.getElementById('ckModal').classList.add('show');
+  document.getElementById('ckName').focus();
+}
+function createCheck(){
+  const name = document.getElementById('ckName').value.trim();
+  if(!name){ toast('请填写项目名称'); return; }
+  const cats = [...document.querySelectorAll('#ckCatPick input:checked')].map(i=>i.value);
+  if(!cats.length){ toast('请至少选择一个分类'); return; }
+  const rules = DB.rules.filter(r=>cats.includes(r.cat));
+  if(!rules.length){ toast('所选分类下没有规范'); return; }
+  const ck = {
+    id: uid(), name, createdAt: now(),
+    items: rules.map(r=>({ ruleId:r.id, title:r.title, content:r.content||'', cat:r.cat, state:'', note:'' }))
+  };
+  DB.checks.unshift(ck); saveDB();
+  closeModal('ckModal');
+  toast(`已创建，共 ${ck.items.length} 项`);
+  runCheck(ck.id);
+}
+function runCheck(id){
+  state.runningCheckId = id;
+  const ck = DB.checks.find(c=>c.id===id); if(!ck) return;
+  document.getElementById('ckListWrap').style.display='none';
+  document.getElementById('ckRunWrap').style.display='block';
+  document.getElementById('ckRunTitle').textContent = ck.name;
+  document.getElementById('ckRunMeta').textContent = `创建于 ${fmtTime(ck.createdAt)} · ${ck.items.length} 项`;
+  renderCkItems();
+}
+function exitCheck(){
+  state.runningCheckId = null;
+  document.getElementById('ckRunWrap').style.display='none';
+  document.getElementById('ckListWrap').style.display='block';
+  renderCheckList();
+}
+function renderCkItems(){
+  const ck = DB.checks.find(c=>c.id===state.runningCheckId); if(!ck) return;
+  const total = ck.items.length;
+  const pass = ck.items.filter(i=>i.state==='pass').length;
+  const risk = ck.items.filter(i=>i.state==='risk').length;
+  const na = ck.items.filter(i=>i.state==='na').length;
+  const done = pass+risk+na;
+  document.getElementById('ckStats').innerHTML = `
+    <span>通过 <b style="color:var(--green)">${pass}</b></span>
+    <span>风险 <b style="color:var(--orange)">${risk}</b></span>
+    <span>不适用 ${na}</span>
+    <span>未查 ${total-done}</span>
+    ${risk? '<span style="color:var(--orange)">⚠ 有风险项需在下单前确认闭环</span>':''}`;
+  document.getElementById('ckProgressBar').style.width = (total? done/total*100:0)+'%';
+  document.getElementById('ckItems').innerHTML = ck.items.map((it,i)=>`
+    <div class="ck-item" data-state="${it.state}" data-i="${i}">
+      <div class="ci-top">
+        <div class="ci-num">${String(i+1).padStart(2,'0')} · ${esc(it.cat)}</div>
+        <div class="ci-body">
+          <div class="ci-title">${esc(it.title)}${it.edited?'<span class="er-badge">本清单已修改</span>':''}</div>
+          <div class="ci-content">${esc(it.content)}</div>
+          <div class="ci-note"><input placeholder="备注：现状说明 / 改进措施 / 责任人…" value="${esc(it.note)}" onchange="setNote(${i}, this.value)"></div>
+        </div>
+        <div class="state-btns">
+          <button class="s-pass" onclick="setState(${i},'pass')">✓ 通过</button>
+          <button class="s-risk" onclick="setState(${i},'risk')">! 风险</button>
+          <button class="s-na" onclick="setState(${i},'na')">— 不适用</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function setState(i, s){
+  const ck = DB.checks.find(c=>c.id===state.runningCheckId);
+  ck.items[i].state = ck.items[i].state===s? '' : s;
+  saveDB(); renderCkItems();
+}
+function setNote(i, v){
+  const ck = DB.checks.find(c=>c.id===state.runningCheckId);
+  ck.items[i].note = v; saveDB();
+}
+function deleteCheck(){
+  if(!confirm('确定删除此检查清单？')) return;
+  DB.checks = DB.checks.filter(c=>c.id!==state.runningCheckId);
+  saveDB(); exitCheck(); toast('已删除');
+}
+
+/* ================= 设计流程（塑胶产品结构设计） ================= */
+const FLOW_SEED = {
+  name:'塑胶产品结构设计流程',
+  nodes:[
+    {title:'外形尺寸设计', content:'1. 确定产品整体尺寸与外观风格（依据需求/竞品/堆叠）；\n2. 划分外观件：上下壳 / 前后壳 / 装饰件，确定分件线、段差（≤0.15mm）与缝隙（0.15~0.3mm）；\n3. 预留接口开孔：USB、按键、显示、进出音孔等，评估孔位强度与外观影响。\n输出物：外观尺寸图 / 分件示意图。'},
+    {title:'壁厚设计', content:'1. 主壁厚 1.5~3.0mm（视产品大小），同件壁厚差 ±20% 以内；\n2. 厚区减胶/掏空防缩水，厚薄交接 R 角或斜面过渡；\n3. 按材料确认缩水率（PC/ABS 0.4%~0.6%），关键孔位预放模具修正量。\n输出物：壁厚分布图 / 关键剖面图。'},
+    {title:'拔模与分模设计', content:'1. 确定出模方向与分模线（PL），外观线尽量落在分件缝或 R 角上；\n2. 拔模角 ≥0.5°~1°，深腔 ≥1°~2°，咬花面按纹深每 0.025mm 加 1°；\n3. 全面排查倒扣：优先改结构规避，其次斜顶/行位/内抽芯。\n输出物：分模图 / 倒扣清单及模具方案。'},
+    {title:'加强筋与螺丝柱设计', content:'1. 加强筋厚 ≤0.6t，根部 R ≥0.3t，过深筋做减胶槽；\n2. 自攻螺丝柱：孔径 0.55~0.65×螺丝直径，外径 2~2.4 倍孔径，根部减胶/火山口防缩水；\n3. 大平面布置筋网防翘曲，柱高 >30mm 加筋防偏摆。\n输出物：筋位/柱位布置图。'},
+    {title:'卡扣与连接设计', content:'1. 悬臂卡扣根部厚 ≤0.6~0.8t，装配应变校核（ABS≈3%、PC≈4%、PP≈6%）；\n2. 导入角 30°~45°，需拆卸位置设计解锁结构或工具孔；\n3. 卡扣避开浇口与熔接痕，确认模具斜顶/行位出模方式。\n输出物：卡扣布置图 / 尺寸与应变计算表。'},
+    {title:'装配设计', content:'1. 定位方案：止口/定位柱/定位面，基准统一；\n2. 公差链分析，关键间隙段差管控；方向性件做防呆不对称设计；\n3. 螺丝锁付顺序（对角）与工具可达性模拟；排线/FPC 弯曲半径 ≥6~10 倍线厚。\n输出物：装配顺序图 / 公差分析表。'},
+    {title:'密封与防水设计', content:'1. 硅胶圈线径与压缩量 20%~30%（静态），密封槽截面 ≥ 圈截面；\n2. 止口定位 + 密封圈双保险，锁付扭力与顺序保证压缩均匀；\n3. IP54 以上评估防水透气膜平衡气压。\n输出物：密封结构剖面图 / 防水等级定义。'},
+    {title:'表面处理与标识', content:'1. 外观面工艺：咬花/晒纹/喷涂/电镀/丝印，纹深需补偿拔模角；\n2. 丝印/镭雕位置避开分模线、顶针位与曲率突变处；\n3. 认证标识位置预留（安规/环保/logo），考虑磨损与耐久。\n输出物：外观处理说明 / 标识位置图。'},
+  ]
+};
+function defaultFlow(name){
+  const f = JSON.parse(JSON.stringify(FLOW_SEED));
+  f.id = uid(); f.name = name || FLOW_SEED.name; f.createdAt = now(); f.currentIdx = 0;
+  f.nodes.forEach(n=>{ n.id = uid(); n.state = 'todo'; n.note = ''; });
+  return f;
+}
+function renderFlow(){
+  if(!Array.isArray(DB.flows)) DB.flows = [defaultFlow()];
+  if(state.flowView==='run' && DB.flows.some(f=>f.id===state.flowId)) renderFlowRun();
+  else { state.flowView='list'; renderFlowList(); }
+}
+function renderFlowList(){
+  document.getElementById('flowListWrap').style.display='block';
+  document.getElementById('flowRunWrap').style.display='none';
+  const wrap = document.getElementById('flowList');
+  if(!DB.flows.length){
+    wrap.innerHTML = '<div class="empty">还没有设计流程。点击"新建设计流程"，自动载入塑胶产品结构设计八步流程，可自由增删改节点。</div>';
+    return;
+  }
+  wrap.innerHTML = DB.flows.map(f=>{
+    const total = f.nodes.length;
+    const done = f.nodes.filter(n=>n.state==='done').length;
+    const pct = total? Math.round(done/total*100):0;
+    return `<div class="ck-card" data-id="${f.id}">
+      <div style="flex:1">
+        <div class="ck-name">${esc(f.name)}</div>
+        <div class="ck-meta">${f.createdAt?fmtTime(f.createdAt):''} · ${total} 个节点 · 已完成 ${done} 个</div>
+        <div class="ck-actions" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="event.stopPropagation(); copyFlow('${f.id}')">⧉ 复制</button>
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteFlowFromList('${f.id}')">✕ 删除</button>
+        </div>
+      </div>
+      <div class="progress" style="max-width:160px"><div class="progress-bar" style="width:${pct}%"></div></div>
+      <div style="font-size:13px;color:var(--text-2);width:42px;text-align:right">${pct}%</div>
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('.ck-card').forEach(card=>card.onclick=()=>openFlow(card.dataset.id));
+}
+function createFlow(){
+  const f = defaultFlow();
+  DB.flows.unshift(f); saveDB();
+  toast('已新建设计流程（含 8 个默认节点，均可编辑）');
+  openFlow(f.id);
+}
+function copyFlow(id){
+  const fid = id || state.flowId;
+  const f = DB.flows.find(x=>x.id===fid); if(!f) return;
+  const copy = JSON.parse(JSON.stringify(f));
+  copy.id = uid(); copy.name = f.name + ' 副本'; copy.createdAt = now();
+  copy.nodes.forEach(n=>n.id = uid());
+  DB.flows.unshift(copy); saveDB();
+  if(id){ renderFlowList(); } else { renderFlowRun(); }
+  toast('已复制为「'+copy.name+'」');
+}
+function deleteFlowFromList(id){
+  const f = DB.flows.find(x=>x.id===id); if(!f) return;
+  if(!confirm(`确定删除设计流程「${f.name}」？`)) return;
+  DB.flows = DB.flows.filter(x=>x.id!==id);
+  saveDB(); renderFlowList(); toast('已删除');
+}
+function deleteFlow(){
+  if(state.flowId){ deleteFlowFromList(state.flowId); state.flowView='list'; renderFlow(); }
+}
+function openFlow(id){
+  state.flowId = id; state.flowView='run'; state.flowEditing=false;
+  renderFlowRun();
+}
+function exitFlow(){ state.flowView='list'; state.flowId=null; renderFlow(); }
+function curFlow(){ return DB.flows.find(f=>f.id===state.flowId); }
+function renameFlow(){
+  const f = curFlow(); if(!f) return;
+  const name = prompt('修改流程名称：', f.name);
+  if(name && name.trim()){ f.name = name.trim(); saveDB(); renderFlowRun(); }
+}
+function renderFlowRun(){
+  const f = curFlow(); if(!f) return;
+  document.getElementById('flowListWrap').style.display='none';
+  document.getElementById('flowRunWrap').style.display='block';
+  document.getElementById('flowRunTitle').textContent = f.name;
+  document.getElementById('flowRunMeta').textContent = `创建于 ${fmtTime(f.createdAt)} · ${f.nodes.length} 个节点 · 点击标题可重命名`;
+  const done = f.nodes.filter(n=>n.state==='done').length;
+  const doing = f.nodes.filter(n=>n.state==='doing').length;
+  document.getElementById('flowStats').innerHTML = `
+    <span>已完成 <b style="color:var(--green)">${done}</b></span>
+    <span>进行中 <b style="color:var(--orange)">${doing}</b></span>
+    <span>未开始 ${f.nodes.length-done-doing}</span>
+    <span>当前：第 ${Math.min((f.currentIdx||0)+1, f.nodes.length)} 步 / 共 ${f.nodes.length} 步</span>`;
+  const pct = f.nodes.length? Math.round(done/f.nodes.length*100):0;
+  document.getElementById('flowProgressBar').style.width = pct+'%';
+  // 步骤列表
+  document.getElementById('flowSteps').innerHTML = f.nodes.map((n,i)=>`
+    <div class="step-item ${i===f.currentIdx?'current':''}" data-state="${n.state}" onclick="gotoNode(${i})">
+      <div class="step-ico">${n.state==='done'?'✓':n.state==='doing'?'▶':i+1}</div>
+      <div class="step-title">${esc(n.title)}</div>
+    </div>`).join('') +
+    `<button class="step-add" onclick="addFlowNode()">＋ 添加节点</button>`;
+  // 当前节点卡片
+  renderFlowNode();
+}
+function renderFlowNode(){
+  const f = curFlow(); if(!f || !f.nodes.length) return;
+  const i = Math.min(f.currentIdx||0, f.nodes.length-1);
+  f.currentIdx = i;
+  const n = f.nodes[i];
+  const stateTxt = {todo:'未开始', doing:'进行中', done:'已完成'}[n.state]||'未开始';
+  let html;
+  if(state.flowEditing){
+    html = `<div class="node-edit">
+      <input id="fnTitle" value="${esc(n.title)}" placeholder="节点标题（例：壁厚设计）">
+      <textarea id="fnContent" placeholder="节点内容：设计要点、参数、输出物…（支持多行）">${esc(n.content||'')}</textarea>
+      <div class="node-btns">
+        <button class="btn btn-primary" onclick="saveFlowNode()">保存</button>
+        <button class="btn" onclick="cancelFlowNodeEdit()">取消</button>
+      </div>
+    </div>`;
+  } else {
+    html = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div><h3>第 ${i+1} 步 · ${esc(n.title)}</h3>
+        <span class="tag" style="margin-top:4px;display:inline-block">${stateTxt}</span></div>
+      </div>
+      <div class="node-content">${esc(n.content||'（暂无内容，点「✎ 编辑」填写设计要点）')}</div>
+      <div class="node-note"><input placeholder="备注：本节点结论 / 待办 / 遗留问题…" value="${esc(n.note||'')}" onchange="setFlowNote(${i}, this.value)"></div>
+      <div class="node-btns">
+        <div class="state-btns v2">
+          <button class="s-na" onclick="setNodeState(${i},'todo')">未开始</button>
+          <button class="s-risk" onclick="setNodeState(${i},'doing')">▶ 进行中</button>
+          <button class="s-pass" onclick="setNodeState(${i},'done')">✓ 完成</button>
+        </div>
+      </div>
+      <div class="node-btns">
+        <button class="btn btn-primary" onclick="doneAndNext()">✓ 完成本步并进入下一步</button>
+      </div>
+      <div class="node-btns">
+        <button class="btn btn-sm" onclick="editFlowNode()">✎ 编辑节点</button>
+        <button class="btn btn-sm" onclick="moveNode(${i},-1)" ${i===0?'disabled':''}>↑ 上移</button>
+        <button class="btn btn-sm" onclick="moveNode(${i},1)" ${i===f.nodes.length-1?'disabled':''}>↓ 下移</button>
+        <button class="btn btn-sm" onclick="insertNodeAfter(${i})">＋ 在后插入</button>
+        <button class="btn btn-sm btn-danger" onclick="removeFlowNode(${i})">✕ 删除节点</button>
+        ${(lastDeletedNode && lastDeletedNode.flowId===f.id) ? '<button class="btn btn-sm" onclick="undoDeleteNode()" title="恢复最近删除的节点">↩ 撤销删除</button>' : ''}
+      </div>
+      <div class="node-btns" style="justify-content:space-between">
+        <button class="btn btn-sm" onclick="gotoNode(${i-1})" ${i===0?'disabled':''}>← 上一步</button>
+        <button class="btn btn-sm" onclick="gotoNode(${i+1})" ${i===f.nodes.length-1?'disabled':''}>下一步 →</button>
+      </div>`;
+  }
+  document.getElementById('flowNodeCard').innerHTML = html;
+}
+function gotoNode(i){
+  const f = curFlow(); if(!f) return;
+  if(i<0 || i>=f.nodes.length) return;
+  f.currentIdx = i; state.flowEditing=false;
+  saveDB(); renderFlowRun();
+}
+function setNodeState(i, s){
+  const f = curFlow(); if(!f) return;
+  f.nodes[i].state = f.nodes[i].state===s? 'todo' : s;
+  saveDB(); renderFlowRun();
+}
+function setFlowNote(i, v){ const f = curFlow(); if(!f) return; f.nodes[i].note = v; saveDB(); }
+function doneAndNext(){
+  const f = curFlow(); if(!f) return;
+  f.nodes[f.currentIdx].state = 'done';
+  if(f.currentIdx < f.nodes.length-1){ f.currentIdx++; toast('已完成，进入第 '+(f.currentIdx+1)+' 步'); }
+  else toast('全部节点已完成 🎉');
+  saveDB(); renderFlowRun();
+}
+function editFlowNode(){ state.flowEditing = true; renderFlowNode(); }
+function cancelFlowNodeEdit(){ state.flowEditing = false; renderFlowNode(); }
+function saveFlowNode(){
+  const f = curFlow(); if(!f) return;
+  const n = f.nodes[f.currentIdx];
+  const title = document.getElementById('fnTitle').value.trim();
+  if(!title){ toast('请填写节点标题'); return; }
+  n.title = title; n.content = document.getElementById('fnContent').value; n.edited = true;
+  state.flowEditing = false;
+  saveDB(); renderFlowRun(); toast('节点已保存');
+}
+function addFlowNode(){
+  const f = curFlow(); if(!f) return;
+  f.nodes.push({ id:uid(), title:'新节点', content:'', state:'todo', note:'' });
+  f.currentIdx = f.nodes.length-1; state.flowEditing = true;
+  saveDB(); renderFlowRun();
+}
+function insertNodeAfter(i){
+  const f = curFlow(); if(!f) return;
+  f.nodes.splice(i+1, 0, { id:uid(), title:'新节点', content:'', state:'todo', note:'' });
+  f.currentIdx = i+1; state.flowEditing = true;
+  saveDB(); renderFlowRun();
+}
+function removeFlowNode(i){
+  const f = curFlow(); if(!f) return;
+  if(!confirm(`确定删除节点「${f.nodes[i].title}」？可点「撤销删除」恢复。`)) return;
+  const removed = f.nodes.splice(i,1)[0];
+  lastDeletedNode = { flowId:f.id, index:i, node:removed };
+  if(f.currentIdx >= f.nodes.length) f.currentIdx = Math.max(0, f.nodes.length-1);
+  state.flowEditing = false;
+  saveDB(); renderFlowRun();
+}
+let lastDeletedNode = null;
+function undoDeleteNode(){
+  const f = curFlow();
+  if(!f || !lastDeletedNode || lastDeletedNode.flowId!==f.id){ toast('没有可撤销的删除'); return; }
+  const idx = Math.min(lastDeletedNode.index, f.nodes.length);
+  f.nodes.splice(idx, 0, lastDeletedNode.node);
+  f.currentIdx = idx;
+  lastDeletedNode = null;
+  state.flowEditing = false;
+  saveDB(); renderFlowRun(); toast('已撤销删除，节点已恢复到原位置');
+}
+function moveNode(i, dir){
+  const f = curFlow(); if(!f) return;
+  const j = i+dir;
+  if(j<0 || j>=f.nodes.length) return;
+  const t = f.nodes[i]; f.nodes[i] = f.nodes[j]; f.nodes[j] = t;
+  f.currentIdx = j;
+  saveDB(); renderFlowRun();
+}
+
+/* ================= 数据管理 ================= */
+function renderData(){
+  const catN = new Set(DB.rules.map(r=>r.cat)).size;
+  document.getElementById('statCards').innerHTML = `
+    <div class="stat-card"><div class="v">${DB.rules.length}</div><div class="l">规范条目</div></div>
+    <div class="stat-card"><div class="v">${catN}</div><div class="l">已用分类</div></div>
+    <div class="stat-card"><div class="v">${DB.checks.length}</div><div class="l">检查清单</div></div>
+    <div class="stat-card"><div class="v">${Array.isArray(DB.flows)?DB.flows.length:0}</div><div class="l">设计流程</div></div>
+    <div class="stat-card"><div class="v">${DB.checks.reduce((s,c)=>s+c.items.filter(i=>i.state==='risk').length,0)}</div><div class="l">待闭环风险项</div></div>`;
+}
+async function exportData(){
+  toast('正在打包附件…');
+  const medias = await MediaStore.all();
+  const mediaOut = [];
+  for(const m of medias){
+    try { mediaOut.push({ id:m.id, type:m.type, mime:m.mime, name:m.name, dataUrl: await blobToDataURL(m.blob) }); } catch(e){}
+  }
+  // file 文件夹内的附件：尝试读取并嵌入备份
+  const seenPaths = new Set();
+  for(const r of DB.rules){
+    for(const m of (r.media||[])){
+      if(m.kind!=='file' || !m.path || seenPaths.has(m.path)) continue;
+      seenPaths.add(m.path);
+      try{
+        const res = await fetch(m.path);
+        if(res.ok){
+          mediaOut.push({ kind:'file', path:m.path, type:m.type, mime:m.mime, name:m.name, dataUrl: await blobToDataURL(await res.blob()) });
+        }
+      }catch(e){ /* file:// 下无法读取，跳过（请随备份一并拷贝 file 文件夹） */ }
+    }
+  }
+  const payload = { rules: DB.rules, checks: DB.checks, flows: DB.flows||[], media: mediaOut, exportedAt: now() };
+  const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '结构设计知识库备份_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast(mediaOut.length? `已导出备份（含 ${mediaOut.length} 个附件）` : '已导出备份文件');
+}
+async function importData(mode){
+  const f = document.getElementById('importFile').files[0];
+  if(!f){ toast('请先选择 JSON 文件'); return; }
+  const reader = new FileReader();
+  reader.onload = async e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!Array.isArray(data.rules) || !Array.isArray(data.checks)) throw new Error('bad');
+      if(mode==='replace'){
+        if(!confirm('将用备份完全替换当前全部数据（含附件），确定？')) return;
+        await MediaStore.clear();
+        DB.rules = data.rules; DB.checks = data.checks; DB.flows = data.flows||[];
+      } else {
+        const rids = new Set(DB.rules.map(r=>r.id));
+        let rn=0; data.rules.forEach(r=>{ if(!rids.has(r.id)){ DB.rules.push(r); rn++; } });
+        const cids = new Set(DB.checks.map(c=>c.id));
+        let cn=0; data.checks.forEach(c=>{ if(!cids.has(c.id)){ DB.checks.push(c); cn++; } });
+        if(!Array.isArray(DB.flows)) DB.flows = [];
+        const fids = new Set(DB.flows.map(f=>f.id));
+        let fn=0; (data.flows||[]).forEach(f=>{ if(!fids.has(f.id)){ DB.flows.push(f); fn++; } });
+        const mn = await mergeMediaEntries(data.media);
+        toast(`合并完成：新增规范 ${rn} 条、清单 ${cn} 份、流程 ${fn} 份、附件 ${mn} 个`);
+      }
+      saveDB(); refreshAll(); renderData();
+    }catch(err){ toast('文件格式不正确'); }
+  };
+  reader.readAsText(f);
+}
+/* 一键同步到手机：打包当前全部数据，经电脑端同步服务推送到手机 APK（需先运行 启动同步服务.bat，手机 APP 处于打开状态） */
+async function syncToPhone(){
+  const btn = document.getElementById('pcSyncBtn');
+  if(!btn) return;
+  try{
+    btn.disabled = true; btn.textContent = '正在打包数据…';
+    const medias = await MediaStore.all();
+    const mediaOut = [];
+    for(const m of medias){
+      try { mediaOut.push({ id:m.id, type:m.type, mime:m.mime, name:m.name, dataUrl: await blobToDataURL(m.blob) }); } catch(e){}
+    }
+    const seenPaths = new Set();
+    for(const r of DB.rules){
+      for(const m of (r.media||[])){
+        if(m.kind!=='file' || !m.path || seenPaths.has(m.path)) continue;
+        seenPaths.add(m.path);
+        try{
+          const res = await fetch(m.path);
+          if(res.ok){
+            mediaOut.push({ kind:'file', path:m.path, type:m.type, mime:m.mime, name:m.name, dataUrl: await blobToDataURL(await res.blob()) });
+          }
+        }catch(e){ /* file:// 下无法读取，跳过 */ }
+      }
+    }
+    const payload = { rules: DB.rules, checks: DB.checks, flows: DB.flows||[], media: mediaOut, exportedAt: now() };
+    const htmlPath = decodeURIComponent(location.href.replace(/^file:\/\/\//i,''));
+    btn.textContent = '正在推送到手机…';
+    const resp = await fetch('http://127.0.0.1:18765/push_to_phone', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ html_path: htmlPath, backup: payload })
+    });
+    const out = await resp.json();
+    toast(out.message || (out.ok ? '已推送到手机' : '推送失败'));
+  }catch(err){
+    toast('推送失败：请先双击运行 手机版\\电脑端同步\\启动同步服务.bat，并确认手机 APP 已打开（同一WiFi）');
+  }finally{
+    btn.disabled = false; btn.textContent = '⇪ 同步到手机';
+  }
+}
+/* 手机 APP 内隐藏该按钮（Android WebView UA 含 "; wv)"） */
+if(/\;\s*wv\)/i.test(navigator.userAgent)){
+  const w = document.getElementById('pcSyncWrap');
+  if(w) w.style.display = 'none';
+}
+function resetSeed(){
+  const ids = new Set(DB.rules.map(r=>r.id));
+  // 以标题+分类去重，避免重复载入
+  const keys = new Set(DB.rules.map(r=>r.title+'|'+r.cat));
+  let n=0;
+  SEED.forEach(s=>{
+    if(keys.has(s.title+'|'+s.cat)) return;
+    DB.rules.push(Object.assign({}, s, { id: uid(), createdAt: now(), updatedAt: now() }));
+    keys.add(s.title+'|'+s.cat); n++;
+  });
+  saveDB(); refreshAll(); renderData();
+  toast(n? `已载入 ${n} 条预置规范` : '预置规范已全部存在');
+}
+
+/* ================= 初始化 ================= */
+function refreshAll(){ renderSidebar(); renderRules(); }
+(function init(){
+  if(!localStorage.getItem(DB_KEY)) { resetSeed(); }
+  else if(!DB.rules.length) { resetSeed(); }
+  if(!Array.isArray(DB.flows)){ DB.flows = [defaultFlow()]; saveDB(); }
+  state._sort='time';
+  refreshAll();
+  initTabDrag();
+  if(window.showDirectoryPicker){
+    const b = document.getElementById('authDirBtn');
+    if(b) b.style.display='';
+  }
+})();
+
+/* ================= 顶部选项卡：拖动排序（记住顺序） ================= */
+const TAB_KEY = 'sd_kb_taborder';
+function applyTabOrder(){
+  let order = [];
+  try { order = JSON.parse(localStorage.getItem(TAB_KEY)) || []; } catch(e){}
+  const tabs = document.querySelector('.nav-tabs');
+  const btns = [...tabs.querySelectorAll('button')];
+  order.forEach(v=>{ const b = btns.find(x=>x.dataset.view===v); if(b) tabs.appendChild(b); });
+}
+function saveTabOrder(){
+  const order = [...document.querySelectorAll('.nav-tabs button')].map(b=>b.dataset.view);
+  localStorage.setItem(TAB_KEY, JSON.stringify(order));
+}
+function initTabDrag(){
+  applyTabOrder();
+  const tabs = document.querySelector('.nav-tabs');
+  let dragEl = null;
+  tabs.querySelectorAll('button').forEach(b=>{
+    b.draggable = true;
+    b.title = (b.title? b.title+' · ':'') + '可拖动调整顺序';
+    b.addEventListener('dragstart', e=>{
+      dragEl = b; e.dataTransfer.effectAllowed = 'move';
+      try{ e.dataTransfer.setData('text/plain', b.dataset.view); }catch(err){}
+      b.style.opacity = '.35';
+    });
+    b.addEventListener('dragend', ()=>{ b.style.opacity=''; dragEl=null; saveTabOrder(); });
+    b.addEventListener('dragover', e=>{
+      e.preventDefault();
+      if(!dragEl || dragEl===b) return;
+      const r = b.getBoundingClientRect();
+      const before = e.clientX < r.left + r.width/2;
+      tabs.insertBefore(dragEl, before? b : b.nextSibling);
+    });
+  });
+}
+</script>
+</body>
+</html>
